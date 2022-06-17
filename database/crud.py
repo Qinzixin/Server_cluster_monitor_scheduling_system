@@ -1,4 +1,104 @@
-from typing import Dict, List
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+'''
+@File    :   crud.py    
+@License :   (C)Copyright 2021 , atomsocial
+
+如果出现了mysql错误：pymysql.err.OperationalError: (1205, 'Lock wait timeout exceeded; try restarting transaction') 错误
+请执行下面两句话，进行会话kill
+select * from information_schema.innodb_trx;
+kill XXXX
+
+接口中注意silence参数要使用object 传参的方式
+'''
+from msilib.schema import Error
+import re
+from datetime import datetime
+from typing import List
+
+from sqlalchemy.exc import IntegrityError, DataError
+from sqlalchemy.orm import Session
+from .base import Base as TableBase
+from sqlalchemy import desc, asc
+from sqlalchemy.orm.query import Query
+from typing import Any
+import time
+from sqlalchemy.dialects.mysql import insert
+import operator
+from functools import reduce
+
+
+class MysqlError(Error):
+    pass
+
+def _decorate_excepthon(origin_func):
+    """
+    目前主要用于数据更新和数据插入的异常拦截
+    :param origin_func:
+    :return:
+    """
+
+    def wrapper(*args, **kw):
+        # 需要对参数的顺序进行唯一化调整
+        try:
+            return origin_func(*args, **kw)
+        except IntegrityError as e:
+            if kw and "silence" in kw and kw.get("silence"):
+                return None
+            err_str = e.orig.args[1]
+            if e.orig.args[0] == 1452:
+                # err_str='Cannot add or update a child row: a foreign key constraint fails (`atom`.`users`, CONSTRAINT `users_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`))'
+                if err_str.startswith("Cannot add or update a child row: a foreign key constraint fails"):
+                    print("外键约束错误")  # XXX 约束XXX
+                    a = re.compile(
+                        "[\w\W]+?\(`(?P<database>\w+?)`\.`(?P<table_child>\w+?)`, CONSTRAINT `\w+?` FOREIGN KEY \(`(?P<table_child_seg>\w+?)`\) REFERENCES `(?P<table_parent>\w+?)` \(`(?P<table_parent_seg>\w+?)`\)\)")
+                    regMatch = a.match(err_str)
+                    if regMatch:
+                        result = regMatch.groupdict()
+                        print(result)
+                        raise MysqlError(
+                            "数据录入错误",
+                            data={"orig": e.orig.args,
+                                  "message": f"外键约束错误({result['table_parent']}.{result['table_parent_seg']}可能不存在)",
+                                  "table": result.get("table_child", ""),
+                                  "segment": result.get("table_child_seg", ""),
+                                  })
+            elif e.orig.args[0] == 1062:  # 唯一字段检查
+                a = re.compile(
+                    "Duplicate entry '[\w]+' for key '(?P<table_child_seg>\w+?)'")
+                regMatch = a.match(err_str)
+                if regMatch:
+                    result = regMatch.groupdict()
+                    raise MysqlError(
+                        "数据录入错误",
+                        data={"orig": e.orig.args, "message": f"表中已经存在{result['table_child_seg']}",
+                              "table": result.get("table_child", ""),
+                              "segment": result.get("table_child_seg", ""),
+                              })
+            else:
+                raise (e)
+        except DataError as e:
+            # pymysql.err.DataError: (1406, "Data too long for column 'group' at row 1")
+            err_str = e.orig.args[1]
+            if e.orig.args[0] == 1406:  # 唯一字段检查
+                a = re.compile("Data too long for column '(?P<table_child_seg>\w+?)' at[\w\W]+?")
+                regMatch = a.match(err_str)
+                if regMatch:
+                    table_child_seg = regMatch.groupdict().get("table_child_seg")
+                    raise MysqlError(f'数据更新失败', data={"orig": e.orig.args,
+                                                      "message": f"{table_child_seg}字段长度过长。长度为{len(e.params.get(table_child_seg, ''))}",
+                                                      "table": "",
+                                                      "segment": table_child_seg,
+                                                      })
+        finally:
+            args[0].session.commit()  # 一定要加这句话，否则可能会导致trx_mysql_thread
+
+    return wrapper
+
+
+from typing import Dict, Generic, TypeVar, Type, Union, Tuple
+
+ModelType = TypeVar("ModelType", bound=TableBase)
 
 
 class BaseOp(Generic[ModelType]):
@@ -187,30 +287,40 @@ class BaseOp(Generic[ModelType]):
         self.make_query(*criterion, **kw).update(usd_set, synchronize_session=False)
         self.session.commit()
 
-    @staticmethod
-    def get_table_data(base_query, base_filters: List, time_field, keyword_field, page_index: int = 1,
-                       page_size: int = 10,
-                       since: int = 0, until: int = 0, keyword: str = "", sort_by="created_t", is_desc=True
-                       , return_query=False) -> (int, Any):
-        my_filters = base_filters
-        if keyword and keyword.strip():
-            my_filters.append([keyword_field.like(f"%{keyword.strip()}%")])
-        if since:
-            until = int(time.time()) if not until else until
-            my_filters += [time_field >= since, time_field <= until]
-            my_filter = base_query.filter(*my_filters)
-            total = my_filter.count()
-            # 热度的话，暂时定义为 repost_num、comment_num、like_num 三个值的降序排列
-            my_filter = my_filter.order_by(desc(sort_by) if is_desc else asc(sort_by))
-
-        else:  # 按照页获取数据
-            my_filter = base_query.filter(*my_filters)
-            total = my_filter.count()
-            my_filter = my_filter.order_by(desc(sort_by) if is_desc else asc(sort_by)).offset(
-                page_size * (page_index - 1)).limit(page_size)
-        return total, my_filter.all() if not return_query else my_filter
 
     def now_times(self) -> dict:
         created_time = datetime.now()
         return dict(storage_time=created_time,
                     storage_t=int(created_time.timestamp()))
+
+#
+# # filter 查询条件
+# # 1.equal
+# res = session.query(Article).filter(Article.id == 21).first()
+#
+# # 2.notequal
+# res = session.query(Article).filter(Article.id != 21).all()
+#
+# # 3.like & ilike不区分大小写
+# res = session.query(Article).filter(Article.title.like('title%')).all()
+#
+# # 4.in
+# res = session.query(Article).filter(Article.title.in_(['title0', 'title1'])).all()
+#
+# # 5.not in
+# res = session.query(Article).filter(~Article.title.in_(['title0', 'title1'])).all()
+# res = session.query(Article).filter(Article.title.notin_(['title0', 'title1'])).all()
+#
+# # 6.isnull
+# res = session.query(Article).filter(Article.content == None).all()
+#
+# # 7.is not null
+# res = session.query(Article).filter(Article.content != None).all()
+#
+# # 8 and
+# res = session.query(Article).filter(Article.content == None, Article.title.notin_(['title0', 'title1'])).all()
+# res = session.query(Article).filter(and_(Article.content == None, Article.title.notin_(['title0', 'title1']))).all()
+#
+# # 9 or
+# res = session.query(Article).filter(
+#     or_(Article.content != None, Article.title.notin_(['title0', 'title1', 'title5']))).all()
