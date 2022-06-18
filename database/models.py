@@ -53,7 +53,7 @@ class HourInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    day_id = Column(Integer, ForeignKey("DayInfo.pk"))
+    day_id = Column(Integer, ForeignKey("day_info.pk"))
 
 
 class DayInfo(Base):
@@ -70,9 +70,9 @@ class DayInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    week_id = Column(Integer, ForeignKey("WeekInfo.pk"))
-    month_id = Column(Integer, ForeignKey("MonthInfo.pk"))
-    year_id = Column(Integer, ForeignKey("YearInfo.pk"))
+    week_id = Column(Integer, ForeignKey("week_info.pk"))
+    month_id = Column(Integer, ForeignKey("month_info.pk"))
+    year_id = Column(Integer, ForeignKey("year_info.pk"))
     hours = relationship("HourInfo")
 
 
@@ -90,7 +90,7 @@ class WeekInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    week_id = Column(Integer, ForeignKey("ReportWeek.pk"))
+    week_id = Column(Integer, ForeignKey("report_week.pk"))
     days = relationship("DayInfo")
 
 
@@ -108,7 +108,7 @@ class MonthInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    month_id = Column(Integer, ForeignKey("ReportMonth.pk"))
+    month_id = Column(Integer, ForeignKey("report_month.pk"))
     days = relationship("DayInfo")
 
 
@@ -129,7 +129,7 @@ class YearInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    year_id = Column(Integer, ForeignKey("ReportYear.pk"))
+    year_id = Column(Integer, ForeignKey("report_year.pk"))
     days = relationship("DayInfo")
 
 
