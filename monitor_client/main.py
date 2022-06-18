@@ -160,7 +160,8 @@ def get_gpu_status():
         used_info = subprocess.run(
             'nvidia-smi', stdout=subprocess.PIPE).stdout.decode("gbk")
     used_list = _usage_regexp.findall(used_info)
-    all_info = [(device[0], device[1].strip(), int(usage[0]), int(usage[1])) for device, usage in zip(devices, used_list)]
+    all_info = [(device[0], device[1].strip(), int(usage[0]), int(usage[1])) for device, usage in
+                zip(devices, used_list)]
     return all_info
 
 
@@ -387,10 +388,10 @@ def original():
 
     start_time = time.time()
     his_data = []
-    
+
     while True:
         print("Connecting...")
-        with open("config.json","r") as f:
+        with open("config.json", "r") as f:
             config = json.load(f)
         local_reporter = Reporter(config)
         try:
@@ -412,7 +413,7 @@ def original():
                 else:
                     timer -= 1 * INTERVAL
                 # 协议版本
-                array["protocol_version"]=protocol_version
+                array["protocol_version"] = protocol_version
                 # 开机时间
                 array['uptime'] = Uptime
                 # 内存总量
@@ -430,11 +431,11 @@ def original():
                 # 上传流量
                 array['network_out'] = NET_OUT
                 # 额外的GPU信息
-                array["gpu_status"]=gpu_status
+                array["gpu_status"] = gpu_status
                 # 发送的时间刻
-                array["time"]=int(time.time())
+                array["time"] = int(time.time())
                 # 发送的客户机id（pk, primary key）
-                array["pk"]=pk
+                array["pk"] = pk
                 local_reporter.send(json.dumps(array))
                 time.sleep(0.8)
         except KeyboardInterrupt:
