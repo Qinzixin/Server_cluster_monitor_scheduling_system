@@ -13,7 +13,7 @@ class Reporter:
         self.client = KafkaClient(hosts=kafka_info)
         logger.info('Connected.')
 
-        topic_name = "client_info"
+        topic_name = f"client_info_{self.pk}"
 
         # Connect to Topic
         logger.info('Connecting to Topic......')
@@ -30,8 +30,4 @@ class Reporter:
         self.update_state(state=state)
 
 if __name__ == "__main__":
-    # 单数据源秒级生产者
-    produce_messages('event-second', './data/userBehavior_sorted.csv', 'second' )
-
-    # 单数据源小时级生产者
-    produce_messages('event-hour', './data/userBehavior_sorted.csv', 'hour' )
+    pass

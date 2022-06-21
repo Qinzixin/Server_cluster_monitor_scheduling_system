@@ -51,5 +51,5 @@ class Consumer:
             count = 0
 
 if __name__ == '__main__':
-    Consumer().consume(topic_name='client_info', database_name="", consumer_group='secondGroup')
+    Consumer().consume(topic_name='client_info_5', database_name="", consumer_group='secondGroup')
 
