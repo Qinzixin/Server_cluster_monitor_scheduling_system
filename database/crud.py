@@ -28,7 +28,7 @@ import operator
 from functools import reduce
 
 
-class MysqlError(Error):
+class MysqlError(Exception):
     pass
 
 def _decorate_excepthon(origin_func):
@@ -168,7 +168,6 @@ class BaseOp(Generic[ModelType]):
     def count(self, *criterion, **kw) -> int:
         return self.make_query(*criterion, **kw).count()
 
-    @_decorate_excepthon
     def add_from_model(self, model_instance: ModelType, silence: bool = False) -> ModelType:
         # 添加到session
         self.session.add(model_instance)
@@ -177,12 +176,10 @@ class BaseOp(Generic[ModelType]):
         self.session.refresh(model_instance)
         return model_instance
 
-    @_decorate_excepthon
     def refresh_model(self, model_instance: ModelType, silence: bool = False) -> ModelType:
         self.session.refresh(model_instance)
         return model_instance
 
-    @_decorate_excepthon
     def bulk_insert(self, mappings: List[Dict]):
         """
         批量插入，如果插入不进去就报错

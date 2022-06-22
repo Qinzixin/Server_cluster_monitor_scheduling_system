@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
 from database.models import Server
+from database.crud import BaseOp
 from datetime import datetime, timedelta
 from enum import Enum
 
-"""class ServerCrud(BaseOp[Server]):
-    def __init__(self, session: Session):
 
+class ServerCrud(BaseOp[Server]):
+    def __init__(self, session: Session):
+        self.session = session
         super().__init__(session, Server)
-        self.session = session"""
 
 
 class ReportType(Enum):
@@ -63,3 +64,23 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
+    from database.models import DBSession
+
+    # 创建数据库连接
+    session = DBSession()
+    crud = ServerCrud(session)
+    server1 = Server(name="138", address="172.31.41.138")
+    # crud.add_from_model(server1)
+    # 单条件查询
+    server2 = crud.find_one(name="139")
+    # 多条件联合查询
+    server3 = crud.find_one(name="139", pk=3)
+    if server3 is not None:
+        print(server3.name)
+    # 修改值
+    server3.hdd_limit = 35236
+    # 更新数据库
+    server4 = crud.update_from_model(server3)
+    if server4 is not None:
+        print(server4.name)
+    session.close()
