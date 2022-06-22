@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>服务器综合信息平台</title>
+    <link rel="stylesheet" href="static/custom.css">
+    <link rel="stylesheet" href="static/semantic.min.css">
+    <link rel="stylesheet" href="static/icon.min.css">
+    <script src="static/jquery.min.js"></script>
+    <script src="static/semantic.min.js"></script>
+
+
+</head>
+<body>
+    <div class="ui inverted vertical segment" style="background-color: #343a40!important;">
+        <h1 style="color:white;padding: 0rem 0rem;margin-left: 5%;">INSIS 服务器综合信息平台</h1>
+    </div>
+
+    <div style="padding-left:5%; padding-right:5%">
+        <!-- 服务器概况-->
+        <div class="ui vertical segment" id="info" >
+            <h2>平台概况</h2>
+            <div class="ui blue three statistics" style="padding-right: 5%;">
+                <div class="statistic">
+                  <div class="value">
+                    22
+                  </div>
+                  <div class="label">
+                    台服务器
+                  </div>
+                </div>
+                <div class="statistic">
+                  <div class="value">
+                    210
+                  </div>
+                  <div class="label">
+                    位用户
+                  </div>
+                </div>
+                <div class="statistic">
+                  <div class="value">
+                    232243
+                  </div>
+                  <div class="label">
+                    平台累计访问次数
+                  </div>
+                </div>
+              </div>
+        </div>
+        <!--服务器推荐-->
+        <div class="ui vertical segment" id="info">
+          <h2>实时推荐使用服务器</h2>
+          <div class="ui three column grid">
+            <div class="ui column">
+              <div class="ui card">
+                  <div class="content">
+                    <div class="header">Lin-AI-27</div>
+                    <div class="meta">测试服务器</div>
+                    <div class="description">
+                      目前注册用户数量最少
+                    </div>
+                  </div>
+                  <div class="extra content">
+                    <button class="ui button">查看详细信息</button>
+                  </div>
+              </div>
+            </div>
+            <div class="ui  column">
+              <div class="ui card">
+                <div class="content">
+                  <div class="header">Lin-AI-27</div>
+                  <div class="meta">测试服务器</div>
+                  <div class="description">
+                    目前使用可用显存最大
+                  </div>
+                </div>
+                <div class="extra content">
+                  <button class="ui button">查看详细信息</button>
+                </div>
+              </div>
+            </div>
+            <div class="ui column">
+              <div class="ui card">
+                <div class="content">
+                  <div class="header">Lin-AI-27</div>
+                  <div class="meta">测试服务器</div>
+                  <div class="description">
+                    目前使用可用磁盘空间最大
+                  </div>
+                </div>
+                <div class="extra content">
+                  <button class="ui button">查看详细信息</button>
+                </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <!--服务器列表-->
+        <div class="ui vertical segment" id="info" >
+          <h2>服务器列表</h2>
+          <table class="ui celled padded table">
+            <thead>
+              <tr>
+                <th class="single line">名称</th>
+                <th>ip地址</th>
+                <th>推荐指数</th>
+                <th>Cuda版本</th>
+                <th>存放位置</th>
+                <th>详细信息</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <h3 class="ui left aligned header">Lin-AI-27</h3>
+                </td>
+                <td class="single line">
+                  10.126.62.37
+                </td>
+                <td>
+                  <div class="ui star rating disabled" data-rating="3" data-max-rating="3">
+                    <i class="icon active"></i>
+                    <i class="icon active"></i>
+                    <i class="icon active"></i>
+                  </div>
+                </td>
+                <td class="single line">
+                  10.1
+                </td>
+                <td class="single line">
+                  唐山机房
+                </td>
+                <td class="left aligned">
+                  <a href="server.html">服务器使用状况</a>
+                </td>
+
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr><th colspan="6">
+                <div class="ui right floated pagination menu">
+                  <a class="icon item">
+                    <i class="left chevron icon"></i>
+                  </a>
+                  <a class="item">1</a>
+                  <a class="item">2</a>
+                  <a class="item">3</a>
+                  <a class="item">4</a>
+                  <a class="icon item">
+                    <i class="right chevron icon"></i>
+                  </a>
+                </div>
+              </th>
+            </tr></tfoot>
+          </table>
+    </div>
+
+
+
+</body>
+<footer>
+
+</footer>

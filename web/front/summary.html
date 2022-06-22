@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>周报月报界面</title>
+    <link rel="stylesheet" href="static/custom.css">
+    <link rel="stylesheet" href="static/semantic.min.css">
+    <link rel="stylesheet" href="static/icon.min.css">
+    <script src="static/jquery.min.js"></script>
+    <script src="static/semantic.min.js"></script>
+   
+</head>
+<body>
+    <!-- header -->
+    <div class="ui inverted vertical segment" style="background-color: #343a40!important;">
+        <h1 style="color:white;padding: 0rem 0rem;margin-left: 5%;">INSIS 服务器综合信息平台</h1>
+    </div>
+    <!-- content -->
+    <div style="padding-left:5%; padding-right:5%">
+        <div class="ui vertical segment" id="info">
+            <h2>昨日报告</h2>
+            <h3>趋势</h3>
+            <div class="ui three column grid">
+              <!--趋势1-->
+              <div class="ui column">
+                <h4>显存占用</h4>
+                <div class="ui container" style="height: 180px">
+                  <div id="container" style="height: 100%"></div>
+                  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>    
+                  <script type="text/javascript">
+                    var dom = document.getElementById('container');
+                    var myChart = echarts.init(dom, null, {
+                      renderer: 'canvas',
+                      useDirtyRect: false
+                    });
+                    var app = {};
+                    
+                    var option;
+                
+                    option = {
+                      grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                      xAxis: {
+                        type: 'category',
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: [
+                        {
+                          data: [150, 230, 224, 218, 135, 147, 260],
+                          type: 'line'
+                        }
+                      ]
+                };
+                
+                    if (option && typeof option === 'object') {
+                      myChart.setOption(option);
+                    }
+                
+                    window.addEventListener('resize', myChart.resize);
+                  </script>
+                </div>
+              </div>
+              <!--趋势2-->
+              <div class="ui column">
+                <h4>磁盘占用</h4>
+                <div class="ui container" style="height: 180px">
+                  <div id="container2" style="height: 100%"></div>
+                  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>    
+                  <script type="text/javascript">
+                    var dom = document.getElementById('container2');
+                    var myChart2 = echarts.init(dom, null, {
+                      renderer: 'canvas',
+                      useDirtyRect: false
+                    });
+                    var app = {};
+                    
+                    var option;
+                
+                    option = {
+                      grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                      xAxis: {
+                        type: 'category',
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: [
+                        {
+                          data: [250, 130, 224, 212, 335, 143, 260],
+                          type: 'line'
+                        }
+                      ]
+                };
+                
+                    if (option && typeof option === 'object') {
+                      myChart2.setOption(option);
+                    }
+                
+                    window.addEventListener('resize', myChart2.resize);
+                  </script>
+                </div>
+              </div>
+              <!--趋势3-->
+              <div class="ui column">
+                <h4>网络流量</h4>
+                <div class="ui container" style="height: 180px">
+                  <div id="container3" style="height: 100%"></div>
+                  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>    
+                  <script type="text/javascript">
+                    var dom = document.getElementById('container3');
+                    var myChart3 = echarts.init(dom, null, {
+                      renderer: 'canvas',
+                      useDirtyRect: false
+                    });
+                    var app = {};
+                    
+                    var option;
+                
+                    option = {
+                      grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                      xAxis: {
+                        type: 'category',
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: [
+                        {
+                          data: [150, 230, 224, 128, 135, 140, 220],
+                          type: 'line'
+                        }
+                      ]
+                };
+                
+                    if (option && typeof option === 'object') {
+                      myChart3.setOption(option);
+                    }
+                
+                    window.addEventListener('resize', myChart3.resize);
+                  </script>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--趋势结束-->
+        <h3 style ="margin: 0px 0px 15px 0px;">小结</h3>
+        <div class="ui three cards">
+          <a class="olive card">
+            <div class="content">
+              <div class="header">空闲时间占比</div>
+              <div class="description">
+                90%
+              </div>
+            </div>
+          </a>
+          <a class="orange card">
+            <div class="content">
+              <div class="header">最忙服务器</div>
+              <div class="description">
+                LIN-AI-01
+              </div>
+            </div>
+          </a>
+          <a class="olive card">
+            <div class="content">
+              <div class="header">最闲服务器</div>
+              <div class="description">
+                LIN-AI-02
+              </div>
+            </div>
+          </a>
+          <a class="orange card">
+            <div class="content">
+              <div class="header">最繁忙时段</div>
+              <div class="description">
+                22:00-23:00
+              </div>
+            </div>
+          </a>
+          <a class="olive card">
+            <div class="content">
+              <div class="header">最空闲时段</div>
+              <div class="description">
+                5:00-6:00
+              </div>
+            </div>
+          </a>
+        </div>
+    </div>
+
+</body>

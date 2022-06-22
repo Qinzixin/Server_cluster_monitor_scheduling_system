@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>服务器界面</title>
+    <link rel="stylesheet" href="static/custom.css">
+    <link rel="stylesheet" href="static/semantic.min.css">
+    <link rel="stylesheet" href="static/icon.min.css">
+    <script src="static/jquery.min.js"></script>
+    <script src="static/semantic.min.js"></script>
+
+</head>
+<body>
+    <!-- header -->
+    <div class="ui inverted vertical segment" style="background-color: #343a40!important;">
+        <h1 style="color:white;padding: 0rem 0rem;margin-left: 5%;">INSIS 服务器综合信息平台</h1>
+    </div>
+    <!-- content -->
+    <div style="padding-left:5%; padding-right:5%">
+        <!-- 基本信息 -->
+        <div class="ui vertical segment" id="info">
+            <h2>服务器基本信息</h2>
+            <table class="ui celled small table">
+                <thead>
+                    <tr>
+                    <th class="single line">名称</th>
+                    <th>ip地址</th>
+                    <th>Cuda版本</th>
+                    <th>存放位置</th>
+                    <th>GPU卡数量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          <h3 class="ui left aligned small header">Lin-AI-27</h3>
+                        </td>
+                        <td class="single line">
+                          10.126.62.37
+                        </td>
+                        <td class="single line">
+                          10.1
+                        </td>
+                        <td class="single line">
+                          唐山机房
+                        </td>
+                        <td class="left aligned">
+                          3
+                        </td>
+        
+                      </tr>
+                </tbody>
+            </table>
+        </div>
+        <!--动态信息-->
+        <div class="ui vertical segment" id="info">
+            <h2>使用情况</h2>
+            <div class="ui center aligned tiny blue four statistics" style="padding-right: 5%;">
+                <div class="statistic">
+                    <div class="value">
+                      在线
+                    </div>
+                    <div class="label">
+                      状态
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                      2
+                    </div>
+                    <div class="label">
+                      可使用显卡数量
+                    </div>
+                  </div>
+                <div class="statistic">
+                  <div class="value">
+                    31.9%
+                  </div>
+                  <div class="label">
+                    CPU使用率
+                  </div>
+                </div>
+                <div class="statistic">
+                  <div class="value">
+                    39.8%
+                  </div>
+                  <div class="label">
+                   硬盘使用率
+                  </div>
+                </div>
+                <!--div class="statistic">
+                    <div class="value">
+                      25.8%
+                    </div>
+                    <div class="label">
+                     平均空闲时间占比
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                      17:00-1:00
+                    </div>
+                    <div class="label">
+                      最繁忙时段
+                    </div>
+                </div-->
+            </div>
+            <h2>显卡状态</h2>
+            <table class="ui celled small table">
+                <thead>
+                    <tr>
+                    <th class="single line">显卡号</th>
+                    <th>可用状态</th>
+                    <th>型号</th>
+                    <th>显存占用</th>
+                    <th>显存总量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          <h3 class="ui left aligned small header">0号</h3>
+                        </td>
+                        <td>
+                         <i class="large green checkmark icon"></i>
+                        </td>
+                        <td class="single line">
+                            TITAN Xp
+                        </td>
+                        <td class="single line">
+                            7271
+                        </td>
+                        <td class="single line">
+                            12196
+                        </td>
+                      </tr>
+                </tbody>
+            </table>
+            <h2>运行趋势</h2>
+            <!--选择-->            
+            <div class="ui dropdown">
+                数据维度 <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="item">周</div>
+                    <div class="item">天</div>
+                    <div class="item">月</div>
+                </div>
+            </div>
+            <script>
+              $('.ui.dropdown').dropdown();
+            </script>
+    
+            <div class="ui three column grid">
+              <!--趋势1-->
+              <div class="ui column">
+                <h3>显存占用</h3>
+                <div class="ui container" style="height: 280px">
+                  <div id="container" style="height: 100%"></div>
+                  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>    
+                  <script type="text/javascript">
+                    var dom = document.getElementById('container');
+                    var myChart = echarts.init(dom, null, {
+                      renderer: 'canvas',
+                      useDirtyRect: false
+                    });
+                    var app = {};
+                    
+                    var option;
+                
+                    option = {
+                      grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                      xAxis: {
+                        type: 'category',
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: [
+                        {
+                          data: [150, 230, 224, 218, 135, 147, 260],
+                          type: 'line'
+                        }
+                      ]
+                };
+                
+                    if (option && typeof option === 'object') {
+                      myChart.setOption(option);
+                    }
+                
+                    window.addEventListener('resize', myChart.resize);
+                  </script>
+                </div>
+              </div>
+              <!--趋势2-->
+              <div class="ui column">
+                <h3>磁盘占用</h3>
+                <div class="ui container" style="height: 280px">
+                  <div id="container2" style="height: 100%"></div>
+                  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>    
+                  <script type="text/javascript">
+                    var dom = document.getElementById('container2');
+                    var myChart2 = echarts.init(dom, null, {
+                      renderer: 'canvas',
+                      useDirtyRect: false
+                    });
+                    var app = {};
+                    
+                    var option;
+                
+                    option = {
+                      grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                      xAxis: {
+                        type: 'category',
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: [
+                        {
+                          data: [250, 130, 224, 212, 335, 143, 260],
+                          type: 'line'
+                        }
+                      ]
+                };
+                
+                    if (option && typeof option === 'object') {
+                      myChart2.setOption(option);
+                    }
+                
+                    window.addEventListener('resize', myChart2.resize);
+                  </script>
+                </div>
+              </div>
+              <!--趋势3-->
+              <div class="ui column">
+                <h3>网络流量占用</h3>
+                <div class="ui container" style="height: 280px">
+                  <div id="container3" style="height: 100%"></div>
+                  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>    
+                  <script type="text/javascript">
+                    var dom = document.getElementById('container3');
+                    var myChart3 = echarts.init(dom, null, {
+                      renderer: 'canvas',
+                      useDirtyRect: false
+                    });
+                    var app = {};
+                    
+                    var option;
+                
+                    option = {
+                      grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                      xAxis: {
+                        type: 'category',
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      },
+                      yAxis: {
+                        type: 'value'
+                      },
+                      series: [
+                        {
+                          data: [150, 230, 224, 128, 135, 140, 220],
+                          type: 'line'
+                        }
+                      ]
+                };
+                
+                    if (option && typeof option === 'object') {
+                      myChart3.setOption(option);
+                    }
+                
+                    window.addEventListener('resize', myChart3.resize);
+                  </script>
+                </div>
+              </div>
+            </div>
+            <h2>占用情况</h2>
+            <div class="ui three column grid">
+               <!--占用1-->
+               <div class="ui column" style="height: 280px;">
+                <h3>显存占用情况</h3>
+                <div id="container4" style="height: 100%"></div>
+                <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+                <script type="text/javascript">
+                  var dom = document.getElementById('container4');
+                  var myChart4 = echarts.init(dom, null, {
+                    renderer: 'canvas',
+                    useDirtyRect: false
+                  });
+                  var app = {};
+                  
+                  var option;
+
+                  option = {
+                    grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                    tooltip: {
+                      trigger: 'item'
+                    },
+                    legend: {
+                      orient: 'vertical',
+                      left: 'left'
+                    },
+                    series: [
+                      {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [   
+                          { value: 484, name: '已使用' },
+                          { value: 300, name: '未使用' }
+                        ],
+                        emphasis: {
+                          itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                          }
+                        }
+                      }
+                    ]
+                };
+
+                  if (option && typeof option === 'object') {
+                    myChart4.setOption(option);
+                  }
+
+                  window.addEventListener('resize', myChart4.resize);
+                </script>
+               </div>
+               <!--占用2-->
+               <div class="ui column" style="height: 280px;">
+                <h3>硬盘占用情况</h3>
+                <div id="container5" style="height: 100%"></div>
+                <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+                <script type="text/javascript">
+                  var dom = document.getElementById('container5');
+                  var myChart5 = echarts.init(dom, null, {
+                    renderer: 'canvas',
+                    useDirtyRect: false
+                  });
+                  var app = {};
+                  
+                  var option;
+
+                  option = {
+                    grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                    tooltip: {
+                      trigger: 'item'
+                    },
+                    legend: {
+                      orient: 'vertical',
+                      left: 'left'
+                    },
+                    series: [
+                      {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [   
+                          { value: 184, name: '已使用' },
+                          { value: 20, name: '未使用' }
+                        ],
+                        emphasis: {
+                          itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                          }
+                        }
+                      }
+                    ]
+                };
+
+                  if (option && typeof option === 'object') {
+                    myChart5.setOption(option);
+                  }
+
+                  window.addEventListener('resize', myChart5.resize);
+                </script>
+               </div>
+              <!--占用3-->
+              <div class="ui column" style="height: 280px;">
+                <h3>内存占用情况</h3>
+                <div id="container6" style="height: 100%"></div>
+                <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+                <script type="text/javascript">
+                  var dom = document.getElementById('container6');
+                  var myChart6 = echarts.init(dom, null, {
+                    renderer: 'canvas',
+                    useDirtyRect: false
+                  });
+                  var app = {};
+                  
+                  var option;
+
+                  option = {
+                    grid:{
+                        top:'5%',
+                        bottom:'15%'
+                      }, 
+                    tooltip: {
+                      trigger: 'item'
+                    },
+                    legend: {
+                      orient: 'vertical',
+                      left: 'left'
+                    },
+                    series: [
+                      {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [   
+                          { value: 1284, name: '已使用' },
+                          { value: 2044, name: '未使用' }
+                        ],
+                        emphasis: {
+                          itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                          }
+                        }
+                      }
+                    ]
+                };
+
+                  if (option && typeof option === 'object') {
+                    myChart6.setOption(option);
+                  }
+
+                  window.addEventListener('resize', myChart6.resize);
+                </script>
+               </div>
+            </div>
+      </div>
+  </div>
+
+</body>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% if page_title %}
+            {{ page_title }}
+        {% endif %}
+    </title>
+    <link rel="stylesheet" href="static/custom.css">
+    <link rel="stylesheet" href="static/semantic.min.css">
+    <link rel="stylesheet" href="static/icon.min.css">
+    <script src="static/jquery.min.js"></script>
+    <script src="static/semantic.min.js"></script>
+   
+  
+</head>
+<body>
+    <div class="ui padded menu">
+        <h1 style="padding: 0rem 0rem;margin-left: 5%;margin-right: 3rem;margin-top: 1rem;margin-bottom: 1rem">INSIS 服务器综合信息平台</h1>
+         <a class="item" href="#"></a>
+        {% if active == 1 %}
+        <a class="active item" href="/">
+            首页
+        </a>
+        {% else %}
+        <a class="item" href="/">
+            首页
+        </a>
+        {% endif %}
+        {% if active == 3 %}
+        <a class="active item" href="report">报告</a>
+        {% else %}
+         <a class="item" href="report">报告</a>
+        {% endif %}
+        {% if active == 2 %}
+        <a class="active item" href="server">服务器</a>
+        {% else %}
+        <a class="item" href="server">服务器</a>
+        {% endif %}
+    </div>
+
+    <div style="padding-left:5%; padding-right:5%">
+         {% block body %}
+         {% endblock %}
+    </div>
+</body>
+<footer>
+
+</footer>
