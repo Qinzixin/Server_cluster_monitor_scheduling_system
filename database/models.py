@@ -54,13 +54,13 @@ class HourInfo(Base):
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
     day_id = Column(Integer, ForeignKey("day_info.pk"))
-
-
+20220503
+3
 class DayInfo(Base):
     __tablename__ = "day_info"
     pk = Column(Integer, primary_key=True, index=True, autoincrement=True,
                 comment="主键")
-    identity = Column(String(40), nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
+    identity = Column(Integer, nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
     created_time = Column(DateTime, unique=True, comment="写入数据库的时间")
     server = Column(Integer, ForeignKey("server.pk"), comment="归档的服务器")
 
@@ -90,7 +90,7 @@ class WeekInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    week_id = Column(Integer, ForeignKey("report_week.pk"))
+    report_id = Column(Integer, ForeignKey("report_week.pk"))
     days = relationship("DayInfo")
 
 
@@ -108,7 +108,7 @@ class MonthInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    month_id = Column(Integer, ForeignKey("report_month.pk"))
+    report_id = Column(Integer, ForeignKey("report_month.pk"))
     days = relationship("DayInfo")
 
 
@@ -129,7 +129,7 @@ class YearInfo(Base):
     memory_avg = Column(BigInteger, comment="内存平均使用率 ")
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
-    year_id = Column(Integer, ForeignKey("report_year.pk"))
+    report_id = Column(Integer, ForeignKey("report_year.pk"))
     days = relationship("DayInfo")
 
 
@@ -140,14 +140,14 @@ class ReportWeek(Base):
     __tablename__ = "report_week"
     pk = Column(Integer, primary_key=True, index=True, autoincrement=True,
                 comment="主键")
-    identity = Column(String(40), nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
+    identity = Column(Integer, nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
     created_time = Column(DateTime, unique=True, comment="归档的日期,可以代表归档的周数")
     busy_server1 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
-    busy_server2 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
-    busy_server3 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
+    busy_server2 = Column(Integer, ForeignKey("server.pk"), comment="第二服务器")
+    busy_server3 = Column(Integer, ForeignKey("server.pk"), comment="第三服务器")
     idle_server1 = Column(Integer, ForeignKey("server.pk"), comment="最闲服务器")
-    idle_server2 = Column(Integer, ForeignKey("server.pk"), comment="最闲服务器")
-    idle_server3 = Column(Integer, ForeignKey("server.pk"), comment="最闲服务器")
+    idle_server2 = Column(Integer, ForeignKey("server.pk"), comment="第二服务器")
+    idle_server3 = Column(Integer, ForeignKey("server.pk"), comment="第三服务器")
     server_weeks = relationship("WeekInfo")
 
 
@@ -155,14 +155,14 @@ class ReportMonth(Base):
     __tablename__ = "report_month"
     pk = Column(Integer, primary_key=True, index=True, autoincrement=True,
                 comment="主键")
-    identity = Column(String(40), nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
+    identity = Column(Integer, nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
     created_time = Column(DateTime, unique=True, comment="归档的日期,可以代表归档的周数")
     busy_server1 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
-    busy_server2 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
-    busy_server3 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
+    busy_server2 = Column(Integer, ForeignKey("server.pk"), comment="第二忙服务器")
+    busy_server3 = Column(Integer, ForeignKey("server.pk"), comment="第三忙服务器")
     idle_server1 = Column(Integer, ForeignKey("server.pk"), comment="最闲服务器")
-    idle_server2 = Column(Integer, ForeignKey("server.pk"), comment="最闲服务器")
-    idle_server3 = Column(Integer, ForeignKey("server.pk"), comment="最闲服务器")
+    idle_server2 = Column(Integer, ForeignKey("server.pk"), comment="第二闲服务器")
+    idle_server3 = Column(Integer, ForeignKey("server.pk"), comment="第三闲服务器")
     server_months = relationship("MonthInfo")
 
 
@@ -170,7 +170,7 @@ class ReportYear(Base):
     __tablename__ = "report_year"
     pk = Column(Integer, primary_key=True, index=True, autoincrement=True,
                 comment="主键")
-    identity = Column(String(40), nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
+    identity = Column(Integer, nullable=False, comment="标识汇总的字符串,如, 2022-2-3")
     created_time = Column(DateTime, unique=True, comment="归档的日期,可以代表归档的周数")
     busy_server1 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
     busy_server2 = Column(Integer, ForeignKey("server.pk"), comment="最忙服务器")
