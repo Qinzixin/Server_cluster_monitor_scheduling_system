@@ -1,4 +1,10 @@
+from crypt import methods
+import json
+
+from requests import session
+from database.models import DBSession,Server
 from flask import Flask, request, jsonify, render_template
+from main import ServerCrud
 
 app = Flask("my-app")
 
@@ -97,6 +103,24 @@ def report():
         }
     ]
     return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台',active = active)
+
+# 我希望是以post的方式
+@app.route('/api/server/loginorup')
+def report(name,address,memory_limit,hdd_limit,gpu_num):
+    session = DBSession()
+    crud = ServerCrud(session)
+    instance = crud.find_one(address=address)
+    if instance is None:
+        instance = Server(name=name, address=address,memory_limit=memory_limit,hdd_limit=hdd_limit,gpu_num=gpu_num)
+        instance = crud.add_from_model(instance)
+    else:
+        instance.name = name
+        instance.gpu_num = gpu_num
+        instance.hdd_limit =hdd_limit
+        instance.memory_limit =memory_limit
+        instance = crud.update_from_model(instance)
+
+    return json.dumps({"pk": instance.pk})
 
 
 '''

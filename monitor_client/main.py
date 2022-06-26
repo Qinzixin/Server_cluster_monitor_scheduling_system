@@ -17,6 +17,8 @@ import threading
 import traceback
 
 from reporter import Reporter
+import requests
+
 
 PORT = 35601
 CU = "cu.tz.cloudcpp.com"
@@ -368,6 +370,20 @@ def byte_str(object):
     else:
         print(type(object))
 
+def init():
+    ip = socket.gethostbyname(socket.gethostname())
+
+    hostname = subprocess.call(["hostname"])
+    MemoryTotal, MemoryUsed, SwapTotal, SwapFree = get_memory()
+    HDDTotal, HDDUsed = get_hdd()
+    gpu_status = get_gpu_status()
+    payload = {'name': hostname, 'address': ip, "memory_limit":MemoryTotal,"hdd_limit":HDDTotal,"gpu_num":len(gpu_status)}
+    ret = requests.post("http://10.126.62.37/api/server/loginorup", data=payload)
+    result = json.loads(ret)
+    # print(ret.text)
+    print(ip)
+    print(hostname)
+    return result["pk"]
 
 def original():
     INTERVAL = 1
