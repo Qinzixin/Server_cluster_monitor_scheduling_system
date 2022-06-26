@@ -26,11 +26,17 @@ import time
 from sqlalchemy.dialects.mysql import insert
 import operator
 from functools import reduce
+from database.models import DayInfo, WeekInfo, HourInfo, ReportWeek, MonthInfo, ReportMonth, YearInfo, ReportYear, \
+    Server, GPU
 
 
 class MysqlError(Exception):
+    def __init__(self, msg, data):
+        super().__init__(msg)
+        self.data = data
     pass
 
+# 包装错误的方法，不用管
 def _decorate_excepthon(origin_func):
     """
     目前主要用于数据更新和数据插入的异常拦截
@@ -104,6 +110,8 @@ ModelType = TypeVar("ModelType", bound=TableBase)
 class BaseOp(Generic[ModelType]):
     """
     sqlalchemy 的基本的增删改查
+
+    主要使用 find_one(),add_from_model(),update_from_model()
 
     关键词查找： https://www.cnblogs.com/kaerxifa/p/13476317.html
     忽略大小写： https://www.cnblogs.com/shengulong/p/9521598.html
@@ -284,40 +292,68 @@ class BaseOp(Generic[ModelType]):
         self.make_query(*criterion, **kw).update(usd_set, synchronize_session=False)
         self.session.commit()
 
-
     def now_times(self) -> dict:
         created_time = datetime.now()
         return dict(storage_time=created_time,
                     storage_t=int(created_time.timestamp()))
 
-#
-# # filter 查询条件
-# # 1.equal
-# res = session.query(Article).filter(Article.id == 21).first()
-#
-# # 2.notequal
-# res = session.query(Article).filter(Article.id != 21).all()
-#
-# # 3.like & ilike不区分大小写
-# res = session.query(Article).filter(Article.title.like('title%')).all()
-#
-# # 4.in
-# res = session.query(Article).filter(Article.title.in_(['title0', 'title1'])).all()
-#
-# # 5.not in
-# res = session.query(Article).filter(~Article.title.in_(['title0', 'title1'])).all()
-# res = session.query(Article).filter(Article.title.notin_(['title0', 'title1'])).all()
-#
-# # 6.isnull
-# res = session.query(Article).filter(Article.content == None).all()
-#
-# # 7.is not null
-# res = session.query(Article).filter(Article.content != None).all()
-#
-# # 8 and
-# res = session.query(Article).filter(Article.content == None, Article.title.notin_(['title0', 'title1'])).all()
-# res = session.query(Article).filter(and_(Article.content == None, Article.title.notin_(['title0', 'title1']))).all()
-#
-# # 9 or
-# res = session.query(Article).filter(
-#     or_(Article.content != None, Article.title.notin_(['title0', 'title1', 'title5']))).all()
+
+# 基础数据库操作
+class ServerCrud(BaseOp[Server]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, Server)
+
+
+class GPUCrud(BaseOp[GPU]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, GPU)
+
+
+class DayInforCrud(BaseOp[DayInfo]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, DayInfo)
+
+
+class WeekInfoCrud(BaseOp[WeekInfo]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, WeekInfo)
+
+
+class HourInfoCrud(BaseOp[HourInfo]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, HourInfo)
+
+
+class MonthInfoCrud(BaseOp[MonthInfo]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, MonthInfo)
+
+
+class YearInfoCrud(BaseOp[YearInfo]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, YearInfo)
+
+
+class ReportWeekCrud(BaseOp[ReportWeek]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, ReportWeek)
+
+
+class ReportMonthCrud(BaseOp[ReportMonth]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, ReportMonth)
+
+
+class ReportYearCrud(BaseOp[ReportYear]):
+    def __init__(self, session: Session):
+        self.session = session
+        super().__init__(session, ReportYear)

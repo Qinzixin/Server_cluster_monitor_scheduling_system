@@ -70,7 +70,7 @@ if __name__ == '__main__':
     session = DBSession()
     crud = ServerCrud(session)
     server1 = Server(name="138", address="172.31.41.138")
-    # crud.add_from_model(server1)
+    crud.add_from_model(server1)
     # 单条件查询
     server2 = crud.find_one(name="139")
     # 多条件联合查询
