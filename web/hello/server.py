@@ -11,6 +11,22 @@ app = Flask("my-app")
 # 建立数据库连接
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:admin4mysql@10.126.62.37:8843/monitor"
 
+# 以post的方式
+@app.route('/api/server/loginorup')
+def report(name,address,memory_limit,hdd_limit,gpu_num):
+    session = DBSession()
+    crud = ServerCrud(session)
+    instance = crud.find_one(address=address)
+    if instance is None:
+        instance = Server(name=name, address=address,memory_limit=memory_limit,hdd_limit=hdd_limit,gpu_num=gpu_num)
+        instance = crud.add_from_model(instance)
+    else:
+        instance.name = name
+        instance.gpu_num = gpu_num
+        instance.hdd_limit =hdd_limit
+        nstance.memory_limit =memory_limit
+        instance = crud.update_from_model(instance)
+    return json.dumps({"pk": instance.pk})
 
 # 验证是否连接成功
 @app.route('/database')
