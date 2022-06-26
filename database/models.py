@@ -1,5 +1,4 @@
 # 导入:
-from email.policy import default
 import pymysql
 from sqlalchemy import Column, Date, DateTime, Float, String, create_engine
 from sqlalchemy.orm import sessionmaker
@@ -54,8 +53,8 @@ class HourInfo(Base):
     gpu_memory_avg = Column(Float, comment="gpu显存平均使用率")
     idle_rate = Column(Float, comment="空闲比率 ")
     day_id = Column(Integer, ForeignKey("day_info.pk"))
-20220503
-3
+
+
 class DayInfo(Base):
     __tablename__ = "day_info"
     pk = Column(Integer, primary_key=True, index=True, autoincrement=True,
