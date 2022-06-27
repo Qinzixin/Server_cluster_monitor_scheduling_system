@@ -11,7 +11,7 @@ kill XXXX
 
 接口中注意silence参数要使用object 传参的方式
 '''
-from msilib.schema import Error
+# from msilib.schema import Error
 import re
 from datetime import datetime
 from typing import List

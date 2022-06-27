@@ -61,8 +61,18 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
-# Press the green button in the gutter to run the script.
+
+# redis使用案例，下面演示了访问一台服务器的信息的操作 
 if __name__ == '__main__':
+    from database.redis import Redis
+    red = Redis()
+    red.hset("client_info_1","memory_used",48325)
+    red.hset("client_info_1","hdd_used",35225)
+    red.hset("client_info_1","uptime",62356)
+    print(red.hget("client_info_1","hdd_used"))
+    
+# db使用案例
+if False:
     print_hi('PyCharm')
     from database.models import DBSession
 

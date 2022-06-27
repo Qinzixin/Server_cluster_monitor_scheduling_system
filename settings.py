@@ -3,3 +3,7 @@ MYSQL_USER = "root"
 MYSQL_PORT = 8843
 MYSQL_PASSWD = "admin4mysql"
 MYSQL_DB = "monitor"
+
+REDIS_HOST="10.126.62.37"
+REDIS_PORT=9531
+REDIS_PASSWD="admin4redis"
