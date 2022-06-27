@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:admin4mysql@10.126
 
 # 以post的方式
 @app.route('/api/server/loginorup')
-def report(name,address,memory_limit,hdd_limit,gpu_num):
+def report2(name,address,memory_limit,hdd_limit,gpu_num):
     session = DBSession()
     crud = ServerCrud(session)
     instance = crud.find_one(address=address)
@@ -34,27 +34,22 @@ def report(name,address,memory_limit,hdd_limit,gpu_num):
     return json.dumps({"pk": instance.pk})
 
 # 验证是否连接成功
-@app.route('/database')
-def hello_word():
+# @app.route('/database_server')
+def get_server():
     session = DBSession()
     crud = ServerCrud(session)
     #
-    instance = crud.find_one(pk=1)
-
-    """engine = db.get_engine()
-    conn = engine.connect()
-    conn.close()
-    with engine.connect() as conn:
-        result = conn.execute('select 1')  # 这两步打开数据库并且创建表
-        print(result.fetchone())  # 打印一条数据"""
-    print(instance)
-
-    print(instance.name)
-
-    print(ServerReturn.from_orm(instance))
-    pdm = ServerReturn.from_orm(instance)
-    print(pdm.json())
-    return pdm.json()
+    instances = crud.find()
+    json_list=[]
+    for instance in instances:
+        print(instance)
+        print(instance.name)
+        print(ServerReturn.from_orm(instance))
+        pdm = ServerReturn.from_orm(instance)
+        # pdj = pdm.json() # 返回json字符串
+        # print(pdm.json())
+        json_list.append(pdm)
+    return json_list
 
 
 # front page
@@ -67,6 +62,7 @@ def index():
         'user_num': 210,
         'click_num': 232243
     }
+    '''
     server_infos = [
         {
             "name": "Lin-AI-26", "ip": "10.126.62.37", "cuda": "10.1", "location": "唐山机房",
@@ -77,6 +73,8 @@ def index():
             "further_info": '<a href="server">服务器使用状况</a>'
         }
     ]
+    '''
+    server_infos = get_server()
     # 推荐服务器，汇总数据
     recommend_infos = [
         {
