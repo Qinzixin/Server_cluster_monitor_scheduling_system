@@ -102,7 +102,7 @@
       </h3>
     </td>
     <td class="single line">
-      {{ server["ip"] }}
+      {{ server["address"] }}
     </td>
     <td>
       <div class="ui star rating disabled" data-rating="3" data-max-rating="5">
@@ -112,13 +112,13 @@
       </div>
     </td>
     <td class="single line">
-      {{ server["cuda"] }}
+      {{ server["cuda_version"] }}
     </td>
     <td class="single line">
       {{ server["location"] }}
     </td>
     <td class="left aligned">
-     {{ server["further_info"] | safe }}
+        <a href="server/ {{ server["id"] | safe }}/">服务器使用状况</a>
     </td>
   </tr>
  {% endfor %}
