@@ -118,7 +118,7 @@
       {{ server["location"] }}
     </td>
     <td class="left aligned">
-        <a href="server/ {{ server["id"] | safe }}/">服务器使用状况</a>
+        <a href= {{ 'server?sid=' + server["name"]  | safe}}>服务器使用状况</a>
     </td>
   </tr>
  {% endfor %}

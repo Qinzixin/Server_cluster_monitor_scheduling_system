@@ -17,19 +17,19 @@
         <tbody>
             <tr>
                 <td>
-                  <h3 class="ui left aligned small header">Lin-AI-27</h3>
+                  <h3 class="ui left aligned small header">{{ server["server"]}}</h3>
                 </td>
                 <td class="single line">
-                  10.126.62.37
+                  {{ server["ip"]}}
                 </td>
                 <td class="single line">
-                  10.1
+                  {{ server["cuda"]}}
                 </td>
                 <td class="single line">
-                  唐山机房
+                    {{ server["location"]}}
                 </td>
                 <td class="left aligned">
-                  3
+                  {{ server["GPU_num"]}}
                 </td>
 
               </tr>
@@ -42,7 +42,7 @@
     <div class="ui center aligned tiny blue four statistics" style="padding-right: 5%;">
         <div class="statistic">
             <div class="value">
-              在线
+              {{  service_status["status"] }}
             </div>
             <div class="label">
               状态
@@ -50,7 +50,7 @@
         </div>
         <div class="statistic">
             <div class="value">
-              2
+                {{  service_status["available_gpu_num"] }}
             </div>
             <div class="label">
               可使用显卡数量
@@ -58,7 +58,7 @@
           </div>
         <div class="statistic">
           <div class="value">
-            31.9%
+              {{  service_status["CPU_rate"] }}
           </div>
           <div class="label">
             CPU使用率
@@ -66,7 +66,7 @@
         </div>
         <div class="statistic">
           <div class="value">
-            39.8%
+              {{  service_status["HDD_rate"] }}
           </div>
           <div class="label">
            硬盘使用率

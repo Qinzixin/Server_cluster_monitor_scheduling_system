@@ -1,4 +1,4 @@
-from crypt import methods
+# from crypt import methods
 import json
 
 from requests import session
@@ -15,6 +15,14 @@ app = Flask("my-app")
 
 # 建立数据库连接
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:admin4mysql@10.126.62.37:8843/monitor"
+
+from database.redis import Redis
+red = Redis()
+red.hset("client_info_1","memory_used",48325)
+red.hset("client_info_1","hdd_used",35225)
+red.hset("client_info_1","uptime",62356)
+print(red.hget("client_info_1","hdd_used"))
+print(red.hget("client_info_1", "memory_used"))
 
 # 以post的方式
 @app.route('/api/server/loginorup')
@@ -101,38 +109,46 @@ def index():
 
 # server status page, display 实时数据
 @app.route('/server')
-def server():
+def server_detail():
+    r = request.args.get('sid')
+    if r==None:
+        # do something
+        return 'not found'
+    session = DBSession()
+    crud = ServerCrud(session)
+    this = crud.find_one(name=r)
+    if this is not None:
+        server_info = {"server": str(this.name), "ip": str(this.address), "cuda": str(this.cuda_version), "location": str(this.location), "GPU_num": str(this.gpus)}
+        service_status = {"status": "实时数据", "available_gpu_num": "实时数据", "CPU_rate": "实时数据", "HDD_rate": "实时数据"}
+        GPU_status = [ {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196" },
+            {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196"}
+        ]
+        occupy_status = [{
+                "occupy_id": 1,
+                "used": 20,
+                "total": 150
+            },
+            {
+                "occupy_id": 2,
+                "used": 20,
+                "total": 110
+            },
+            {
+                "occupy_id": 3,
+                "used": 20,
+                "total": 130
+            }
+        ]
+        active = 2
+        return server(server_info, service_status, GPU_status,occupy_status)
+    else:
+        return "invalid key"
+
+@app.route('/server_test')
+def server(server_info,  service_status, GPU_status,occupy_status):
     print(request.path)
     print(request.full_path)
-    server_info = {"server": "Lin-AI-27", "ip": "10.126.62.37", "cuda": "10.1", "location": "唐山机房", "GPU_num": "3"}
-    service_status = {"status": "在线", "available_gpu_num": "2", "CPU_rate": "31.9%", "HDD_rate": "39.8%"}
-    GPU_status = [
-        {
-            "GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196"
-        },
-        {
-            "GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196"
-        }
-    ]
-    occupy_status = [
-        {
-            "occupy_id": 1,
-            "used": 20,
-            "total": 150
-        },
-        {
-            "occupy_id": 2,
-            "used": 20,
-            "total": 110
-        },
-        {
-            "occupy_id": 3,
-            "used": 20,
-            "total": 130
-        }
-    ]
-    active = 2
-    return render_template('server.html', page_title='服务器 - INSIS GPU管理平台', server=server_info, service=service_status,
+    return render_template('server.html', page_title='服务器 - INSIS GPU管理平台', server=server_info, service_status=service_status,
                            GPU=GPU_status, occupy=occupy_status)
 
 
@@ -159,7 +175,7 @@ def report():
 
 # 我希望是以post的方式
 @app.route('/api/server/loginorup')
-def report(name,address,memory_limit,hdd_limit,gpu_num):
+def add_server(name,address,memory_limit,hdd_limit,gpu_num):
     session = DBSession()
     crud = ServerCrud(session)
     instance = crud.find_one(address=address)

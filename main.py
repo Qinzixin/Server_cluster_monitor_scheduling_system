@@ -70,6 +70,7 @@ if __name__ == '__main__':
     red.hset("client_info_1","hdd_used",35225)
     red.hset("client_info_1","uptime",62356)
     print(red.hget("client_info_1","hdd_used"))
+    print(red.hget("client_info_1", "memory_used"))
     
 # db使用案例
 if False:
