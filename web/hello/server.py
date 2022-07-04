@@ -131,23 +131,28 @@ def server_detail():
         hdd_rate = format(hdd_rate,'.2%')
         memory_rate = format(memory_rate, '.2%')
         service_status = {"status": "在线", "available_gpu_num": "实时数据", "CPU_rate": memory_rate, "HDD_rate": hdd_rate}
-        GPU_status = [ {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196" },
-            {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196"}
+        GPU_status = [ {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196" },
+            {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"}
         ]
+        gpu_used, gpu_total =0,0
+        for gpu in GPU_status:
+            gpu_used += int(gpu["gpu_used"])
+            gpu_total += int(gpu["gpu_total"])
+        print("gpu_used:%d, gpu_total%d" % (gpu_used, gpu_total))
         occupy_status = [{
                 "occupy_id": 1,
-                "used": 20,
-                "total": 150
+                "used": gpu_used,
+                "total": gpu_total
             },
             {
                 "occupy_id": 2,
-                "used": 20,
-                "total": 110
+                "used": hdd_used,
+                "total": this.hdd_limit
             },
             {
                 "occupy_id": 3,
-                "used": 20,
-                "total": 130
+                "used": memory_used,
+                "total": this.memory_limit
             }
         ]
         active = 2
@@ -160,7 +165,7 @@ def server(server_info,  service_status, GPU_status,occupy_status):
     print(request.path)
     print(request.full_path)
     return render_template('server.html', page_title='服务器 - INSIS GPU管理平台', server=server_info, service_status=service_status,
-                           GPU=GPU_status, occupy=occupy_status)
+                           GPUs=GPU_status, occupy_status=occupy_status)
 
 
 # summary page
