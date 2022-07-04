@@ -118,8 +118,19 @@ def server_detail():
     crud = ServerCrud(session)
     this = crud.find_one(name=r)
     if this is not None:
+        from database.redis import Redis
+        red = Redis()
         server_info = {"server": str(this.name), "ip": str(this.address), "cuda": str(this.cuda_version), "location": str(this.location), "GPU_num": str(this.gpus)}
-        service_status = {"status": "实时数据", "available_gpu_num": "实时数据", "CPU_rate": "实时数据", "HDD_rate": "实时数据"}
+        # 实时数据
+        hdd_used =red.hget("client_info_1", "hdd_used")
+        memory_used = red.hget("client_info_1", "memory_used")
+        print(this.hdd_limit)
+        print(this.memory_limit)
+        hdd_rate = float(hdd_used)/float(this.hdd_limit)
+        memory_rate = float(memory_used) / float(this.memory_limit)
+        hdd_rate = format(hdd_rate,'.2%')
+        memory_rate = format(memory_rate, '.2%')
+        service_status = {"status": "在线", "available_gpu_num": "实时数据", "CPU_rate": memory_rate, "HDD_rate": hdd_rate}
         GPU_status = [ {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196" },
             {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_rate": "7271", "gpu_total": "12196"}
         ]
