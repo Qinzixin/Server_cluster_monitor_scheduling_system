@@ -1,11 +1,12 @@
 # from crypt import methods
+from crypt import methods
 import json
 
 from requests import session
-from database.models import DBSession,Server
+from database.models import GPU, DBSession,Server
 from flask import Flask, request, jsonify, render_template
 # from flask_sqlalchemy import SQLAlchemy
-from database.crud import ServerCrud
+from database.crud import GPUCrud, ServerCrud
 from database.models import DBSession
 from database.pdmodel import ServerReturn
 app = Flask("my-app")
@@ -25,20 +26,37 @@ print(red.hget("client_info_1","hdd_used"))
 print(red.hget("client_info_1", "memory_used"))
 
 # 以post的方式
-@app.route('/api/server/loginorup')
-def report2(name,address,memory_limit,hdd_limit,gpu_num):
+@app.route('/api/server/loginorup',methods=["POST"])
+def report2():
+    name = request.form.get("name")
+    address = request.form.get("address")
+    memory_limit = request.form.get("memory_limit")
+    hdd_limit = request.form.get("hdd_limit")
+    gpu_info = json.loads(request.form.get("gpu_info"))
     session = DBSession()
     crud = ServerCrud(session)
     instance = crud.find_one(address=address)
+
     if instance is None:
-        instance = Server(name=name, address=address,memory_limit=memory_limit,hdd_limit=hdd_limit,gpu_num=gpu_num)
+        instance = Server(name=name, address=address,memory_limit=memory_limit,hdd_limit=hdd_limit,gpu_num=len(gpu_info),
+                        cuda_version = gpu_info[0])
         instance = crud.add_from_model(instance)
+        gpu_crud = GPUCrud(session)
+        for gpu_ar in gpu_info[1:]:
+            temp_gpu = GPU(name=gpu_ar[1],cuda_version=gpu_info[0],server_id=instance.pk)
+            gpu_crud.add_from_model(temp_gpu)
     else:
         instance.name = name
-        instance.gpu_num = gpu_num
+        instance.gpu_num = len(gpu_info)-1
         instance.hdd_limit =hdd_limit
-        nstance.memory_limit =memory_limit
+        instance.memory_limit =memory_limit
+        instance.cuda_version = gpu_info[0]
         instance = crud.update_from_model(instance)
+        if instance.gpus is None or len(instance.gpus)==0:
+            gpu_crud = GPUCrud(session)
+            for gpu_ar in gpu_info[1:]:
+                temp_gpu = GPU(name=gpu_ar[1],cuda_version=gpu_info[0],server_id=instance.pk)
+                gpu_crud.add_from_model(temp_gpu)
     return json.dumps({"pk": instance.pk})
 
 # 验证是否连接成功

@@ -145,7 +145,7 @@ def get_network(ip_version):
 
 _device_regexp = re.compile(r'GPU\s+(\d+):(\s[\w\s]+)')
 _usage_regexp = re.compile(r"(\d+)MiB\s+/\s+(\d+)MiB")
-
+_cuda_regexp = re.compile(r"CUDA Version: (\d+.\d+)")
 
 def get_gpu_status():
     try:
@@ -162,8 +162,10 @@ def get_gpu_status():
         used_info = subprocess.run(
             'nvidia-smi', stdout=subprocess.PIPE).stdout.decode("gbk")
     used_list = _usage_regexp.findall(used_info)
-    all_info = [(device[0], device[1].strip(), int(usage[0]), int(usage[1])) for device, usage in
+    cuda_version = _cuda_regexp.findall(used_info)
+    all_info = cuda_version+[(device[0], device[1].strip(), int(usage[0]), int(usage[1])) for device, usage in
                 zip(devices, used_list)]
+    
     return all_info
 
 
@@ -370,20 +372,22 @@ def byte_str(object):
     else:
         print(type(object))
 
-def init():
+def init(config:dict):
     ip = socket.gethostbyname(socket.gethostname())
 
-    hostname = subprocess.call(["hostname"])
+    hostname = subprocess.check_output(["hostname"]).decode("utf8").strip()
     MemoryTotal, MemoryUsed, SwapTotal, SwapFree = get_memory()
     HDDTotal, HDDUsed = get_hdd()
     gpu_status = get_gpu_status()
-    payload = {'name': hostname, 'address': ip, "memory_limit":MemoryTotal,"hdd_limit":HDDTotal,"gpu_num":len(gpu_status)}
-    ret = requests.post("http://10.126.62.37/api/server/loginorup", data=payload)
-    result = json.loads(ret)
+    payload = {'name': hostname, 'address': ip, "memory_limit":MemoryTotal,"hdd_limit":HDDTotal,
+                "gpu_info":json.dumps(gpu_status)}
+    web_url = config["web_url"]
+    print(web_url)
+    ret = requests.post(f"http://{web_url}/api/server/loginorup", data=payload)
+    result = json.loads(ret.content)
     # print(ret.text)
-    print(ip)
-    print(hostname)
-    return result["pk"]
+    print("初始化服务器",hostname,f"({ip})完成,pk为",result["pk"])
+    return int(result["pk"])
 
 def original():
     INTERVAL = 1
@@ -407,11 +411,15 @@ def original():
 
     while True:
         print("Connecting...")
-        with open("config.json", "r") as f:
-            config = json.load(f)
-        local_reporter = Reporter(config)
+        
         try:
-            pk = config["pk"]
+            with open("config.json", "r") as f:
+                config = json.load(f)
+            pk = init(config)
+            config["pk"]=pk
+            with open("config.json", "w") as f:
+                json.dump(config, f)
+            local_reporter = Reporter(config)
             timer = 0
             check_ip = 0
 
@@ -421,7 +429,7 @@ def original():
                 Uptime = get_uptime()
                 MemoryTotal, MemoryUsed, SwapTotal, SwapFree = get_memory()
                 HDDTotal, HDDUsed = get_hdd()
-                gpu_status = get_gpu_status()
+                gpu_status = get_gpu_status()[1:]
                 array = {}
                 if not timer:
                     array['online' + str(check_ip)] = get_network(check_ip)
