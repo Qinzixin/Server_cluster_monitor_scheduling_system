@@ -101,23 +101,29 @@
             </tr>
         </thead>
         <tbody>
+         {% for gpu in GPUs %}
             <tr>
                 <td>
-                  <h3 class="ui left aligned small header">0号</h3>
+                  <h3 class="ui left aligned small header">  {{ gpu["GPU_id"] }}</h3>
                 </td>
                 <td>
-                 <i class="large green checkmark icon"></i>
+                    {% if gpu["availability"] == "1" %}
+                     <i class="large green checkmark icon"></i>
+                    {% else %}
+                     <i class="large red exclamation icon"></i>
+                    {% endif %}
                 </td>
                 <td class="single line">
-                    TITAN Xp
+                    {{ gpu["type"] }}
                 </td>
                 <td class="single line">
-                    7271
+                    {{ gpu["gpu_used"] }}
                 </td>
                 <td class="single line">
-                    12196
+                    {{ gpu["gpu_total"] }}
                 </td>
               </tr>
+            {% endfor %}
         </tbody>
     </table>
     <!--h2>运行趋势</h2-->
@@ -300,8 +306,8 @@
                 type: 'pie',
                 radius: '50%',
                 data: [
-                  { value: 484, name: '已使用' },
-                  { value: 300, name: '未使用' }
+                  { value:{{  occupy_status[0]["used"]  }}, name: '已使用' },
+                  { value: {{ occupy_status[0]["total"] }}, name: '未使用' }
                 ],
                 emphasis: {
                   itemStyle: {
@@ -354,8 +360,8 @@
                 type: 'pie',
                 radius: '50%',
                 data: [
-                  { value: 184, name: '已使用' },
-                  { value: 20, name: '未使用' }
+                  { value: {{ occupy_status[1]["used"] }}, name: '已使用' },
+                  { value: {{ occupy_status[1]["total"] }}, name: '未使用' }
                 ],
                 emphasis: {
                   itemStyle: {
@@ -408,8 +414,8 @@
                 type: 'pie',
                 radius: '50%',
                 data: [
-                  { value: 1284, name: '已使用' },
-                  { value: 2044, name: '未使用' }
+                  { value: {{ occupy_status[2]["used"] }}, name: '已使用' },
+                  { value: {{ occupy_status[2]["total"] }}, name: '未使用' }
                 ],
                 emphasis: {
                   itemStyle: {
