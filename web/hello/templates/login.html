@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='select2.min.css') }}" />
+</head>
+<body>
+<form method="post">
+	{{ form.csrf_token }} <!-- 渲染CSRF令牌隐藏字段 -->
+	{{ form.username.label }}{{ form.username }}<br>
+	{{ form.password.label }}{{ form.password }}<br>
+	{{ form.remember }}{{ form.remember.label }}<br>
+    {{ form.select.label }}{{ form.select}}<br>
+	{{ form.submit }}<br>
+</form>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='select2.min.js') }}"></script>
+<script type="text/javascript">
+    $('select').select2({});
+</script>
+</body>
+</html>
