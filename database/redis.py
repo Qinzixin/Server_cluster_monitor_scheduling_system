@@ -67,7 +67,9 @@ class Redis:
 
 if __name__ == "__main__":
     red = Redis()
-    red.hset("client_info_1","memory_used",48325)
-    red.hset("client_info_1","hdd_used",35225)
-    red.hset("client_info_1","uptime",62356)
-    print(red.hget("client_info_1","hdd_used"))
+    # red.hset("client_info_1","memory_used",48325)
+    # red.hset("client_info_1","hdd_used",35225)
+    # red.hset("client_info_1","uptime",62356)
+    red.expire("test_info_1",10)
+    # print(red.hget("client_info_1","hdd_used"))
+

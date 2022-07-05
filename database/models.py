@@ -18,7 +18,7 @@ class Server(Base):
     pk = Column(Integer, primary_key=True, index=True, autoincrement=True,
                 comment="服务器主键")
     name = Column(String(40), nullable=False, comment="服务器名称")
-    address = Column(String(100), nullable=False, unique=True, comment="ip")
+    address = Column(String(100), nullable=False,  comment="ip")
     description = Column(String(100), nullable=True, comment="服务器描述，用于描述此服务器的一些特征，便于选择")
     memory_limit = Column(BigInteger, comment="内存上限")
     hdd_limit = Column(BigInteger, comment="硬盘空间上限")
