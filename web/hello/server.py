@@ -1,6 +1,6 @@
 # from crypt import methods
 import json
-
+from json import load, dump
 from requests import session
 from database.models import GPU, DBSession,Server
 from flask import Flask, request, jsonify, render_template
@@ -126,10 +126,15 @@ def get_server():
 def index():
     print(request.path)
     print(request.full_path)
+    people = 0
+    with open("people.json") as f:  # 打开json数据 并将访问量+1
+        people = load(f) + 1
+    with open("people.json", "w") as f:  # 再存储到文件中
+        dump(people, f)
     index_info = {
         'server_num': 23,
         'user_num': 210,
-        'click_num': 232243
+        'click_num': people
     }
     '''
     server_infos = [
@@ -168,7 +173,7 @@ def index():
                            servers=server_infos, r=recommend_infos, active=active)
 
 
-# server status page, display 实时数据
+# 服务器页面
 @app.route('/server')
 def server_detail():
     r = request.args.get('sid')
@@ -182,7 +187,7 @@ def server_detail():
         from database.redis import Redis
         red = Redis()
         server_info = {"server": str(this.name), "ip": str(this.address), "cuda": str(this.cuda_version),
-                       "location": str(this.location), "GPU_num": str(this.gpus)}
+                       "location": str(this.location), "GPU_num": str(this.gpu_num)}
         # 实时数据
         hdd_used = red.hget("client_info_1", "hdd_used")
         memory_used = red.hget("client_info_1", "memory_used")
@@ -193,10 +198,15 @@ def server_detail():
         hdd_rate = format(hdd_rate, '.2%')
         memory_rate = format(memory_rate, '.2%')
         service_status = {"status": "在线", "available_gpu_num": "实时数据", "CPU_rate": memory_rate, "HDD_rate": hdd_rate}
-        GPU_status = [
-            {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"},
-            {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"}
-        ]
+        GPU_status = []
+        for gpu in this.gpus:
+            gpu_info = {"GPU_id": gpu.pk, "availability": "1", "type": gpu.cuda_version, "gpu_used": "9999",
+                        "gpu_total": "9999"}
+            GPU_status.append(gpu_info)
+        # GPU_status = [
+        #     {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"},
+        #     {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"}
+        # ]
         gpu_used, gpu_total = 0, 0
         for gpu in GPU_status:
             gpu_used += int(gpu["gpu_used"])
