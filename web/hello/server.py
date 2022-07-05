@@ -76,6 +76,8 @@ def report2():
     memory_limit = request.form.get("memory_limit")
     hdd_limit = request.form.get("hdd_limit")
     gpu_info = json.loads(request.form.get("gpu_info"))
+    if isinstance(address,str) and address.startswith("127."):
+        return "IP地址不能是以127开头的地址"
     session = DBSession()
     crud = ServerCrud(session)
     instance = crud.find_one(address=address)
