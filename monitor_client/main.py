@@ -4,6 +4,7 @@
 # 版本：1.0.3, 支持Python版本：2.7 to 3.10
 # 支持操作系统： Linux, OSX, FreeBSD, OpenBSD and NetBSD, both 32-bit and 64-bit architectures
 # 说明: 默认情况下修改server和user就可以了。丢包率监测方向可以自定义，例如：CU = "www.facebook.com"。
+import argparse
 import socket
 import time
 import timeit
@@ -372,8 +373,12 @@ def byte_str(object):
     else:
         print(type(object))
 
-def init(config:dict):
-    ip = socket.gethostbyname(socket.gethostname())
+def init(config:dict,custom_ip:str):
+    if len(custom_ip)>4:
+        print("use custom ip",custom_ip)
+        ip = custom_ip
+    else:
+        ip = socket.gethostbyname(socket.gethostname())
 
     hostname = subprocess.check_output(["hostname"]).decode("utf8").strip()
     MemoryTotal, MemoryUsed, SwapTotal, SwapFree = get_memory()
@@ -389,10 +394,10 @@ def init(config:dict):
     print("初始化服务器",hostname,f"({ip})完成,pk为",result["pk"])
     return int(result["pk"])
 
-def original():
+def original(custom_ip=""):
     INTERVAL = 1
     protocol_version = 1.0
-    for argc in sys.argv:
+    """for argc in sys.argv:
         if 'SERVER' in argc:
             SERVER = argc.split('SERVER=')[-1]
         elif 'PORT' in argc:
@@ -402,7 +407,7 @@ def original():
         elif 'PASSWORD' in argc:
             PASSWORD = argc.split('PASSWORD=')[-1]
         elif 'INTERVAL' in argc:
-            INTERVAL = int(argc.split('INTERVAL=')[-1])
+            INTERVAL = int(argc.split('INTERVAL=')[-1])"""
     socket.setdefaulttimeout(30)
     get_realtime_data()
 
@@ -415,7 +420,7 @@ def original():
         try:
             with open("config.json", "r") as f:
                 config = json.load(f)
-            pk = init(config)
+            pk = init(config,custom_ip)
             config["pk"]=pk
             with open("config.json", "w") as f:
                 json.dump(config, f)
@@ -478,4 +483,8 @@ def original():
 
 
 if __name__ == '__main__':
-    original()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip",default="",type=str,help="如果不能正确初始化，请手工指定IP地址")
+    args = parser.parse_args()
+    print(args.ip)
+    original(args.ip)
