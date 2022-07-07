@@ -311,7 +311,7 @@ class GPUCrud(BaseOp[GPU]):
         super().__init__(session, GPU)
 
 
-class DayInforCrud(BaseOp[DayInfo]):
+class DayInfoCrud(BaseOp[DayInfo]):
     def __init__(self, session: Session):
         self.session = session
         super().__init__(session, DayInfo)
