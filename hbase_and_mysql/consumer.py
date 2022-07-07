@@ -30,40 +30,38 @@ def create_table(conn, table, families):
         except:
             print('Failed to create table <{}>'.format(table))
 
-def insert_row_hbase(conn, table, inputs):
+def insert_row_hbase(conn, inputs):
     """
     :return: 向hbase中插入数据
     """
     print('Inserting row........')
+    
+    line_dic = json.loads(inputs.decode().strip())
     # 获得table实例
-    table = conn.table(table)
-
-    # 批量发送数据 每一批最多十条
-    with table.batch(batch_size=1) as bat:
-        line_dic = json.loads(inputs.decode().strip())
-
-        habse_ms_dic = {}
+    table_name = "hbase_client_info_" + str(line_dic["pk"])
+    table = conn.table(table_name)
+    habse_ms_dic = {}
+    
+    habse_ms_dic['cf1:Pk'] = str(line_dic["pk"])
+    habse_ms_dic['cf1:Time'] = str(line_dic["time"])
+    habse_ms_dic['cf1:Memory_total'] = str(line_dic["memory_used"])
+    habse_ms_dic['cf1:Memory_used'] = str(line_dic["hdd_used"])
+    habse_ms_dic['cf1:Hdd_total'] = str(line_dic["hdd_total"])
+    habse_ms_dic['cf1:Hdd_used'] = str(line_dic["hdd_used"])
+    habse_ms_dic['cf1:Cpu'] = str(line_dic["cpu"])
+    habse_ms_dic['cf1:Network_in'] = str(line_dic["network_in"])
+    habse_ms_dic['cf1:Network_out'] = str(line_dic["network_out"])
+    gpu_count = 0
+    for i in range(len(line_dic["gpu_status"])):
+        habse_ms_dic[f'cf1:Gpu_{i}_used'] = str(line_dic["gpu_status"][i][2])
+        gpu_count += 1
+    for i in range(len(line_dic["gpu_status"])):
+        habse_ms_dic[f'cf1:Gpu_{i}_total'] = str(line_dic["gpu_status"][i][3])
+    habse_ms_dic['cf1:Gpu_count'] = str(gpu_count)
         
-        habse_ms_dic['cf1:Pk'] = str(line_dic["pk"])
-        habse_ms_dic['cf1:Time'] = str(line_dic["time"])
-        habse_ms_dic['cf1:Memory_total'] = str(line_dic["memory_used"])
-        habse_ms_dic['cf1:Memory_used'] = str(line_dic["hdd_used"])
-        habse_ms_dic['cf1:Hdd_total'] = str(line_dic["hdd_total"])
-        habse_ms_dic['cf1:Hdd_used'] = str(line_dic["hdd_used"])
-        habse_ms_dic['cf1:Cpu'] = str(line_dic["cpu"])
-        habse_ms_dic['cf1:Network_in'] = str(line_dic["network_in"])
-        habse_ms_dic['cf1:Network_out'] = str(line_dic["network_out"])
-        gpu_count = 0
-        for i in range(len(line_dic["gpu_status"])):
-            habse_ms_dic[f'cf1:Gpu_{i}_used'] = str(line_dic["gpu_status"][i][2])
-            gpu_count += 1
-        for i in range(len(line_dic["gpu_status"])):
-            habse_ms_dic[f'cf1:Gpu_{i}_total'] = str(line_dic["gpu_status"][i][3])
-        habse_ms_dic['cf1:Gpu_count'] = str(gpu_count)
-            
 
-        rowkey =  str(line_dic["time"])
-        bat.put(rowkey, habse_ms_dic)
+    rowkey =  str(line_dic["time"])
+    table.put(rowkey, habse_ms_dic)
 
 def insert_row_redis(red, inputs):
     """
@@ -72,16 +70,17 @@ def insert_row_redis(red, inputs):
     print('Inserting row........')
 
     line_dic = json.loads(inputs.decode().strip())
-
-    red.hset("client_info_1","pk",line_dic["pk"])
-    red.hset("client_info_1","time",line_dic["time"])
-    red.hset("client_info_1","memory_total",line_dic["memory_total"])
-    red.hset("client_info_1","memory_used",line_dic["memory_used"])
-    red.hset("client_info_1","hdd_total",line_dic["hdd_total"])
-    red.hset("client_info_1","hdd_used",line_dic["hdd_used"])
-    red.hset("client_info_1","cpu",line_dic["cpu"])
-    red.hset("client_info_1","network_in",line_dic["network_in"])
-    red.hset("client_info_1","network_out",line_dic["network_out"])
+    table_name = "client_info_" + str(line_dic["pk"])
+    print(table_name)
+    red.hset(table_name,"pk",line_dic["pk"])
+    red.hset(table_name,"time",line_dic["time"])
+    red.hset(table_name,"memory_total",line_dic["memory_total"])
+    red.hset(table_name,"memory_used",line_dic["memory_used"])
+    red.hset(table_name,"hdd_total",line_dic["hdd_total"])
+    red.hset(table_name,"hdd_used",line_dic["hdd_used"])
+    red.hset(table_name,"cpu",line_dic["cpu"])
+    red.hset(table_name,"network_in",line_dic["network_in"])
+    red.hset(table_name,"network_out",line_dic["network_out"])
 
     for i in range(len(line_dic["gpu_status"])):
         red.hset("client_info_1",f"gpu_{i}_used",line_dic["gpu_status"][i][2])
@@ -108,7 +107,7 @@ def consumer(topic_name,con,red):
     #                                      auto_offset_reset=OffsetType.LATEST,
     #                                      reset_offset_on_start=False)
     consumer  = topic.get_simple_consumer(auto_commit_enable=True,auto_commit_interval_ms=1)
-
+    
     count = 0
     while True:
         for message in consumer:
@@ -117,7 +116,7 @@ def consumer(topic_name,con,red):
                                                              message.value.decode('utf-8')))
                 meassage_value = message.value
 
-                insert_row_hbase(con,'hbase_info_1_2',meassage_value)
+                insert_row_hbase(con,meassage_value)
 
                 insert_row_redis(red,meassage_value)
                 
@@ -129,12 +128,7 @@ if __name__ == '__main__':
     # con = happybase.Connection('10.126.62.37',9494, autoconnect=False)  # 默认9090端口
     con = happybase.Connection('172.31.41.139',9090, autoconnect=False)
     con.open()  # 打开thrift传输'TCP连接
-
     red = Redis()
-    families = {
-        'cf1': dict(max_versions=1),
-    }
-    create_table(con, 'hbase_info_1_2', families)
-    # 秒级消费者
+
     consumer(topic_name='client_info_1',con=con,red=red)
 
