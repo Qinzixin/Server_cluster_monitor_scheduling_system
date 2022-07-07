@@ -1,148 +1,26 @@
 {% extends "default.html" %}
 
 {% block body %}
+
+    <!--趋势结束-->
 <div class="ui vertical segment" id="info">
-    <h2>昨日报告</h2>
-    <h3>趋势</h3>
-    <div class="ui three column grid">
-      <!--趋势1-->
-      <div class="ui column">
-        <h4>显存占用</h4>
-        <div class="ui container" style="height: 180px">
-          <div id="container" style="height: 100%"></div>
-          <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
-          <script type="text/javascript">
-            var dom = document.getElementById('container');
-            var myChart = echarts.init(dom, null, {
-              renderer: 'canvas',
-              useDirtyRect: false
-            });
-            var app = {};
-
-            var option;
-
-            option = {
-              grid:{
-                top:'5%',
-                bottom:'15%'
-              },
-              xAxis: {
-                type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-              },
-              yAxis: {
-                type: 'value'
-              },
-              series: [
-                {
-                  data: [150, 230, 224, 218, 135, 147, 260],
-                  type: 'line'
-                }
-              ]
-        };
-
-            if (option && typeof option === 'object') {
-              myChart.setOption(option);
-            }
-
-            window.addEventListener('resize', myChart.resize);
-          </script>
-        </div>
-      </div>
-      <!--趋势2-->
-      <div class="ui column">
-        <h4>磁盘占用</h4>
-        <div class="ui container" style="height: 180px">
-          <div id="container2" style="height: 100%"></div>
-          <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
-          <script type="text/javascript">
-            var dom = document.getElementById('container2');
-            var myChart2 = echarts.init(dom, null, {
-              renderer: 'canvas',
-              useDirtyRect: false
-            });
-            var app = {};
-
-            var option;
-
-            option = {
-              grid:{
-                top:'5%',
-                bottom:'15%'
-              },
-              xAxis: {
-                type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-              },
-              yAxis: {
-                type: 'value'
-              },
-              series: [
-                {
-                  data: [250, 130, 224, 212, 335, 143, 260],
-                  type: 'line'
-                }
-              ]
-        };
-
-            if (option && typeof option === 'object') {
-              myChart2.setOption(option);
-            }
-
-            window.addEventListener('resize', myChart2.resize);
-          </script>
-        </div>
-      </div>
-      <!--趋势3-->
-      <div class="ui column">
-        <h4>网络流量</h4>
-        <div class="ui container" style="height: 180px">
-          <div id="container3" style="height: 100%"></div>
-          <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
-          <script type="text/javascript">
-            var dom = document.getElementById('container3');
-            var myChart3 = echarts.init(dom, null, {
-              renderer: 'canvas',
-              useDirtyRect: false
-            });
-            var app = {};
-
-            var option;
-
-            option = {
-              grid:{
-                top:'5%',
-                bottom:'15%'
-              },
-              xAxis: {
-                type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-              },
-              yAxis: {
-                type: 'value'
-              },
-              series: [
-                {
-                  data: [150, 230, 224, 128, 135, 140, 220],
-                  type: 'line'
-                }
-              ]
-        };
-
-            if (option && typeof option === 'object') {
-              myChart3.setOption(option);
-            }
-
-            window.addEventListener('resize', myChart3.resize);
-          </script>
-        </div>
-      </div>
-    </div>
-</div>
-<!--趋势结束-->
-<h3 style ="margin: 0px 0px 15px 0px;">小结</h3>
-<div class="ui three cards">
-  <a class="olive card">
+    <h2>报告</h2>
+    <!--选择层次-->
+    <form method="post">
+	{{ form.csrf_token }} <!-- 渲染CSRF令牌隐藏字段 -->
+    {{ form.select}}
+	{{ form.submit }}
+    </form>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='select2.min.js') }}"></script>
+    <script type="text/javascript">
+        $('select').select2({width:'200'});
+    </script>
+    <br>
+    <h3 style ="margin: 0px 0px 15px 0px;">小结</h3>
+    <p>{{ active }}</p>
+    <div class="ui three cards">
+    <a class="olive card">
     <div class="content">
       <div class="header">空闲时间占比</div>
       <div class="description">
@@ -183,5 +61,142 @@
     </div>
   </a>
 </div>
+    <h3>趋势</h3>
+    <div class="ui three column grid">
+      <!--趋势1-->
+      <div class="ui column">
+        <h4>显存占用</h4>
+        <div class="ui container" style="height: 180px">
+          <div id="container" style="height: 100%"></div>
+          <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+          <script type="text/javascript">
+            var dom = document.getElementById('container');
+            var myChart = echarts.init(dom, null, {
+              renderer: 'canvas',
+              useDirtyRect: false
+            });
+            var app = {};
+
+            var option;
+
+            option = {
+              grid:{
+                top:'5%',
+                bottom:'15%'
+              },
+              xAxis: {
+                type: 'category',
+                data: {{ trend[0]['x-axis']|safe}}
+              },
+              yAxis: {
+                type: 'value'
+              },
+              series: [
+                {
+                  data: {{  trend[0]['y-axis']|safe}},
+                  type: 'line'
+                }
+              ]
+        };
+
+            if (option && typeof option === 'object') {
+              myChart.setOption(option);
+            }
+
+            window.addEventListener('resize', myChart.resize);
+          </script>
+        </div>
+      </div>
+      <!--趋势2-->
+      <div class="ui column">
+        <h4>磁盘占用</h4>
+        <div class="ui container" style="height: 180px">
+          <div id="container2" style="height: 100%"></div>
+          <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+          <script type="text/javascript">
+            var dom = document.getElementById('container2');
+            var myChart2 = echarts.init(dom, null, {
+              renderer: 'canvas',
+              useDirtyRect: false
+            });
+            var app = {};
+
+            var option;
+
+            option = {
+              grid:{
+                top:'5%',
+                bottom:'15%'
+              },
+              xAxis: {
+                type: 'category',
+                data: {{ trend[1]['x-axis']|safe}}
+              },
+              yAxis: {
+                type: 'value'
+              },
+              series: [
+                {
+                  data: {{ trend[1]['y-axis']|safe}},
+                  type: 'line'
+                }
+              ]
+        };
+
+            if (option && typeof option === 'object') {
+              myChart2.setOption(option);
+            }
+
+            window.addEventListener('resize', myChart2.resize);
+          </script>
+        </div>
+      </div>
+      <!--趋势3-->
+      <div class="ui column">
+        <h4>网络流量</h4>
+        <div class="ui container" style="height: 180px">
+          <div id="container3" style="height: 100%"></div>
+          <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+          <script type="text/javascript">
+            var dom = document.getElementById('container3');
+            var myChart3 = echarts.init(dom, null, {
+              renderer: 'canvas',
+              useDirtyRect: false
+            });
+            var app = {};
+
+            var option;
+
+            option = {
+              grid:{
+                top:'5%',
+                bottom:'15%'
+              },
+              xAxis: {
+                type: 'category',
+                data: {{ trend[2]['x-axis']|safe}}
+              },
+              yAxis: {
+                type: 'value'
+              },
+              series: [
+                {
+                  data: {{ trend[2]['y-axis']|safe }},
+                  type: 'line'
+                }
+              ]
+        };
+
+            if (option && typeof option === 'object') {
+              myChart3.setOption(option);
+            }
+
+            window.addEventListener('resize', myChart3.resize);
+          </script>
+        </div>
+      </div>
+    </div>
+</div>
+
 {% endblock %}
 

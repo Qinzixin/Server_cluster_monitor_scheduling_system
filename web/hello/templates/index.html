@@ -16,10 +16,10 @@
     </div>
     <div class="statistic">
       <div class="value">
-        {{info["user_num"]}}
+        {{info["gpu_num"]}}
       </div>
       <div class="label">
-        位用户
+        可用显卡数量
       </div>
     </div>
     <div class="statistic">
@@ -42,7 +42,7 @@
               <div class="header">{{r[0]["name"]}}</div>
               <div class="meta">{{r[0]["server-type"]}}</div>
               <div class="description">
-                目前注册用户数量最少
+                目前资源占用率最小，推荐使用
               </div>
             </div>
             <div class="extra content">
@@ -56,7 +56,7 @@
             <div class="header">{{r[1]["name"]}}</div>
             <div class="meta">{{r[1]["server-type"]}}</div>
             <div class="description">
-              目前注册用户数量最少
+              可用资源充分，推荐使用
             </div>
           </div>
           <div class="extra content">
@@ -70,7 +70,7 @@
             <div class="header">{{r[2]["name"]}}</div>
             <div class="meta">{{r[2]["server-type"]}}</div>
             <div class="description">
-              目前注册用户数量最少
+              可用资源充分，推荐使用
             </div>
           </div>
           <div class="extra content">
@@ -106,9 +106,9 @@
     </td>
     <td>
       <div class="ui star rating disabled" data-rating="3" data-max-rating="5">
+      {% for i in range(server["occupy"])%}
         <i class="icon active"></i>
-        <i class="icon active"></i>
-        <i class="icon active"></i>
+      {%   endfor %}
       </div>
     </td>
     <td class="single line">

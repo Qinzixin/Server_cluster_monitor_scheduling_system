@@ -2,3 +2,6 @@
 #info{
     border-bottom: none;
 }
+.select2-container{
+    width: 200px!important;
+}

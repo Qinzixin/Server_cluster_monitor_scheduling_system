@@ -109,6 +109,8 @@
                 <td>
                     {% if gpu["availability"] == "1" %}
                      <i class="large green checkmark icon"></i>
+                    {% elif gpu["availability"] == "2" %}
+                     <i class="large grey sync icon"></i>
                     {% else %}
                      <i class="large red exclamation icon"></i>
                     {% endif %}

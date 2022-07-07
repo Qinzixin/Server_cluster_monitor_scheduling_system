@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify, render_template
 # from flask_sqlalchemy import SQLAlchemy
 from database.crud import GPUCrud, ServerCrud
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, PasswordField, BooleanField, SubmitField, SelectMultipleField
+from wtforms import Form, StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length
 
 from database.crud import ServerCrud
@@ -25,22 +25,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:admin4mysql@10.126
 from database.redis import Redis
 
 red = Redis()
-red.hset("client_info_1", "memory_used", 48325)
-red.hset("client_info_1", "hdd_used", 35225)
-red.hset("client_info_1", "uptime", 62356)
-print(red.hget("client_info_1", "hdd_used"))
-print(red.hget("client_info_1", "memory_used"))
+# red.hset("client_info_1", "memory_used", 48325)
+# red.hset("client_info_1", "hdd_used", 35225)
+# red.hset("client_info_1", "uptime", 62356)
+# print(red.hget("client_info_1", "hdd_used"))
+# print(red.hget("client_info_1", "memory_used"))
 
 app.secret_key = 'secret string'
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(8, 128)])
-    remember = BooleanField('Remember me')
-    select = SelectMultipleField(
-        label='标签', choices=[('Military', '军事'), ('New', '新闻'), ('Society', '社会'), ('Technology', '科技')])
-    submit = SubmitField('Log in')
+    select = SelectField(label="",choices=[('dayinfo', '天信息'),('weekinfo', '周信息'),('monthinfo', '月信息'),('yearinfo', '年信息')])
+    submit = SubmitField('确认')
 
 
 @app.route('/form', methods=['POST', 'GET'])
@@ -111,15 +107,23 @@ def get_server():
     instances = crud.find()
     json_list = []
     for instance in instances:
-        print(instance)
-        print(instance.name)
-        print(ServerReturn.from_orm(instance))
+        #print(instance)
+        #print(instance.name)
+        #print(ServerReturn.from_orm(instance))
         pdm = ServerReturn.from_orm(instance)
         # pdj = pdm.json() # 返回json字符串
         # print(pdm.json())
         json_list.append(pdm)
     return json_list
 
+class server_occupy:
+    def __init__(self,pk,name,occupy,address,cuda,location):
+        self.pk = pk
+        self.name = name
+        self.occupy = occupy
+        self.address = address
+        self.cuda_version = cuda
+        self.location = location
 
 # front page
 @app.route('/')
@@ -131,86 +135,110 @@ def index():
         people = load(f) + 1
     with open("people.json", "w") as f:  # 再存储到文件中
         dump(people, f)
+    server_infos = get_server()
+    server_num = len(server_infos)
+    server_occupy_list = []
+    gpu_sum = 0
+    for server in server_infos:
+        # print(server)
+        r = server.name
+        session = DBSession()
+        crud = ServerCrud(session)
+        this = crud.find_one(name=r)
+        if this is not None:
+            score, gpu_cnt = recommendation(this)
+            gpu_sum += gpu_cnt
+            server_occupy_list.append(server_occupy(this.pk,this.name,score,this.address,this.cuda_version,this.location))
+    def get_key(x):
+        return x.occupy
+    server_occupy_list.sort(key=get_key,reverse=True)
+
+    # for server in server_infos:
+    #    server_occupy_list.
+
+    # 平台概况数据
     index_info = {
-        'server_num': 23,
-        'user_num': 210,
+        'server_num': server_num,
+        'gpu_num': gpu_sum,
         'click_num': people
     }
-    '''
-    server_infos = [
-        {
-            "name": "Lin-AI-26", "ip": "10.126.62.37", "cuda": "10.1", "location": "唐山机房",
-            "further_info": ' <a href="server">服务器使用状况</a>'
-        },
-        {
-            "name": "Lin-AI-27", "ip": "10.126.62.37", "cuda": "10.1", "location": "唐山机房",
-            "further_info": '<a href="server">服务器使用状况</a>'
-        }
-    ]
-    '''
-    server_infos = get_server()
+    # print(server_infos)
     # 推荐服务器，汇总数据
     recommend_infos = [
         {
-            "name": "Lin-AI-26",
-            "server-type": "测试服务器",
-            "link": "server"
+            "name": server_occupy_list[-1].name,
+            "server-type":"测试服务器",
+            "link": "server?sid="+server_occupy_list[-1].name
         },
         {
-            "name": "Lin-AI-27",
+            "name": server_occupy_list[-2].name,
             "server-type": "测试服务器",
-            "link": "server"
+            "link": "server?sid="+server_occupy_list[-2].name
         },
         {
-            "name": "Lin-AI-28",
+            "name": server_occupy_list[-3].name,
             "server-type": "测试服务器",
-            "link": "server"
+            "link": "server?sid=" + server_occupy_list[-3].name
         }
-
     ]
     active = 1
     return render_template('index.html', page_title='首页 - INSIS GPU管理平台', info=index_info,
-                           servers=server_infos, r=recommend_infos, active=active)
+                           servers=server_occupy_list, r=recommend_infos, active=active)
 
 
 # 服务器页面
 @app.route('/server')
 def server_detail():
-    r = request.args.get('sid')
+    r = request.args.get('sid') # get sid or served
     if r == None:
         # do something
         return 'not found'
     session = DBSession()
     crud = ServerCrud(session)
     this = crud.find_one(name=r)
+    server_dynamic = "client_info_" + str(this.pk) # server info
     if this is not None:
         from database.redis import Redis
         red = Redis()
         server_info = {"server": str(this.name), "ip": str(this.address), "cuda": str(this.cuda_version),
                        "location": str(this.location), "GPU_num": str(this.gpu_num)}
         # 实时数据
-        hdd_used = red.hget("client_info_1", "hdd_used")
-        memory_used = red.hget("client_info_1", "memory_used")
-        print(this.hdd_limit)
-        print(this.memory_limit)
-        hdd_rate = float(hdd_used) / float(this.hdd_limit)
-        memory_rate = float(memory_used) / float(this.memory_limit)
-        hdd_rate = format(hdd_rate, '.2%')
-        memory_rate = format(memory_rate, '.2%')
-        service_status = {"status": "在线", "available_gpu_num": "实时数据", "CPU_rate": memory_rate, "HDD_rate": hdd_rate}
+        hdd_used = red.hget(server_dynamic, "hdd_used")
+        memory_used = red.hget(server_dynamic, "memory_used")
+        # print(hdd_used,this.hdd_limit)
+        # print(memory_used,this.memory_limit)
+        if hdd_used is not None:
+            hdd_rate = float(hdd_used) / float(this.hdd_limit)
+            hdd_rate = format(hdd_rate, '.2%')
+        else:
+            hdd_rate = "-"
+        if memory_used is not None:
+            memory_rate = float(memory_used) / float(this.memory_limit)
+            memory_rate = format(memory_rate, '.2%')
+        else:
+            memory_rate = "-"
+
         GPU_status = []
+        available_gpu = 0
         for gpu in this.gpus:
-            gpu_info = {"GPU_id": gpu.pk, "availability": "1", "type": gpu.cuda_version, "gpu_used": "9999",
-                        "gpu_total": "9999"}
+            gpu_used = red.hget(server_dynamic, "gpu_" + str(gpu.pk)+ "_used")
+            gpu_total = red.hget(server_dynamic, "gpu_" + str(gpu.pk) + "_total")
+            state = "0"
+            if gpu_total != None and float(gpu_used)/ float(gpu_total) < 0.90:
+                state = "1"
+                available_gpu +=1
+            elif gpu_total != None:
+                state = "2"
+            gpu_info = {"GPU_id": gpu.pk, "availability": state, "type": gpu.name, "gpu_used": gpu_used,
+                        "gpu_total": gpu_total}
             GPU_status.append(gpu_info)
-        # GPU_status = [
-        #     {"GPU_id": "0", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"},
-        #     {"GPU_id": "1", "availability": "1", "type": "TITIAN Xp", "gpu_used": "7271", "gpu_total": "12196"}
-        # ]
         gpu_used, gpu_total = 0, 0
+        service_status = {"status": "在线", "available_gpu_num": available_gpu, "CPU_rate": memory_rate, "HDD_rate": hdd_rate}
         for gpu in GPU_status:
-            gpu_used += int(gpu["gpu_used"])
-            gpu_total += int(gpu["gpu_total"])
+            if gpu["gpu_used"] != None and gpu["gpu_total"] != None:
+                gpu_used += int(gpu["gpu_used"])
+                gpu_total += int(gpu["gpu_total"])
+
         print("gpu_used:%d, gpu_total%d" % (gpu_used, gpu_total))
         occupy_status = [{
             "occupy_id": 1,
@@ -228,10 +256,48 @@ def server_detail():
                 "total": this.memory_limit
             }
         ]
-        active = 2
         return server(server_info, service_status, GPU_status, occupy_status)
     else:
         return "invalid key"
+
+def recommendation(this):
+    server_dynamic = "client_info_" + str(this.pk)  # server dynamic address
+    from database.redis import Redis
+    red = Redis()
+    # basic info
+    server_info = {"server": str(this.name), "ip": str(this.address), "cuda": str(this.cuda_version),
+                   "location": str(this.location), "GPU_num": str(this.gpu_num)}
+    # dynamic score
+    score = 3
+
+    hdd_used = red.hget(server_dynamic, "hdd_used")
+    memory_used = red.hget(server_dynamic, "memory_used")
+
+    if hdd_used is not None:
+        hdd_rate = float(hdd_used) / float(this.hdd_limit)
+        score += float(hdd_rate)
+
+    else:
+        score -= 0.5
+
+    if memory_used is not None:
+        memory_rate = float(memory_used) / float(this.memory_limit)
+        score += float(memory_rate)
+    else:
+        score -= 0.5
+
+    gpu_sum = 0
+    for gpu in this.gpus:
+        gpu_used = red.hget(server_dynamic, "gpu_" + str(gpu.pk) + "_used")
+        gpu_total = red.hget(server_dynamic, "gpu_" + str(gpu.pk) + "_total")
+        if gpu_total != None and float(gpu_used) / float(gpu_total) < 0.90:
+            score +=  int(float(gpu_used) / float(gpu_total))
+            gpu_sum += 1
+        elif gpu_total != None:
+            score += 0.25
+    score = max(2,int(score))
+    red.hset(server_dynamic,"score",score)
+    return score,gpu_sum
 
 
 @app.route('/server_test')
@@ -244,25 +310,88 @@ def server(server_info, service_status, GPU_status, occupy_status):
 
 
 # summary page
-@app.route('/report')
+@app.route('/report',methods=['POST', 'GET'])
 def report():
-    active = 3
-    trend = [
+    active = "请选择要查看的数据时段，默认为本周数据"
+    # 显存数据，磁盘数据，网络流量数据
+    trend_day = [
         {
             'trend_id': 1,
-            'y-axis': [250, 130, 224, 212, 335, 143, 260],
+            'y-axis': [12619.7, 12619.8, 12619.8, 12621.8, 12625.1, 12625.9, 13626.5],
+            'x-axis': ['0:00', '4:00', '8:00', '12:00', '16:00', '20:00', '24:00']
+        }, {
+            'trend_id': 2,
+            'y-axis': [720.2124, 720.2126, 720.2126, 720.2184, 720.2214, 720.2224, 722.2246],
+            'x-axis': ['0:00', '4:00', '8:00', '12:00', '16:00', '20:00', '24:00']
+        }, {
+            'trend_id': 3,
+            'y-axis': [3059,3059.2,3059.2,3059.8,3060.1, 3060.2,3060.5],
+            'x-axis': ['0:00', '4:00', '8:00', '12:00', '16:00', '20:00', '24:00']
+        }
+    ]
+    trend_week = [
+        {
+            'trend_id': 1,
+            'y-axis': [12619.7, 13219.4, 12612.3, 12719.7, 11949.0, 13949.2, 13629.5],
             'x-axis': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         }, {
             'trend_id': 2,
-            'y-axis': [250, 130, 224, 212, 335, 143, 260],
+            'y-axis': [720.2124, 722.246, 720.3104, 720.3132, 720.4005, 720.4000, 720.418],
             'x-axis': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         }, {
             'trend_id': 3,
-            'y-axis': [250, 130, 224, 212, 335, 143, 260],
+            'y-axis': [3059.4673588105, 3059.4673589105, 3059.4673589805, 3059.4673580005, 3059.4673587105, 3059.4673569105, 3059.4673389105],
             'x-axis': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         }
     ]
-    return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=active)
+    trend_month = [
+        {
+            'trend_id': 1,
+            'y-axis': [12619.7, 12719.7, 12949.0,  12989.5],
+            'x-axis': [ '四周前', '三周前', '两周前', '上周' ]
+        }, {
+            'trend_id': 2,
+            'y-axis': [721.0864, 719.7104, 720.0132,  720.4000],
+            'x-axis': [ '四周前', '三周前', '两周前', '上周']
+        }, {
+            'trend_id': 3,
+            'y-axis': [3059.4673589805, 3059.4673580005, 3059.4673569105,
+                       3059.4673389105],
+            'x-axis':[ '四周前', '三周前', '两周前', '上周' ]
+        }
+    ]
+    trend_year = [
+        {
+            'trend_id': 1,
+            'y-axis': [12619.7, 12719.7, 12949.0, 12989.5],
+            'x-axis': ['四月前', '三月前', '两月前', '上月']
+        }, {
+            'trend_id': 2,
+            'y-axis': [721.0864, 719.7104, 720.0132, 720.4000],
+            'x-axis': ['四月前', '三月前', '两月前', '上月']
+        }, {
+            'trend_id': 3,
+            'y-axis': [3059.4673589805, 3059.4673580005, 3059.4673569105,
+                       3059.4673389105],
+            'x-axis': ['四月前', '三月前', '两月前', '上月']
+        }
+    ]
+    form = LoginForm()
+    if form.validate_on_submit():
+        tags = form.select
+        print('select:{}'.format(tags.data))
+        if tags.data == "weekinfo":
+            return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,trend = trend_week)
+        elif tags.data == "dayinfo":
+            return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,
+                                   trend=trend)
+        elif tags.data == "monthinfo":
+            return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,
+                                   trend=trend_month)
+        elif tags.data == "yearinfo":
+            return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,
+                                   trend=trend_year)
+    return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=active,form=form,trend = trend_week)
 
 
 # 我希望是以post的方式
