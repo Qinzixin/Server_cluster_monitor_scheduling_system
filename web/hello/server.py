@@ -386,7 +386,7 @@ def report():
             return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,trend = trend_week)
         elif tags.data == "dayinfo":
             return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,
-                                   trend=trend)
+                                   trend=trend_day)
         elif tags.data == "monthinfo":
             return render_template('summary.html', page_title='服务器 - INSIS GPU管理平台', active=tags.data, form=form,
                                    trend=trend_month)
