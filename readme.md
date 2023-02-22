@@ -1,8 +1,5 @@
 # Sever Cluster Monitor and Scheduling system(SCMS) / 实验室服务器状态监控系统
 
-![image](https://user-images.githubusercontent.com/5326903/220550783-1a1a0066-cf48-46e7-b518-cef7428d3232.png)
-![image](https://user-images.githubusercontent.com/5326903/220550854-956f693e-b87c-427d-9145-da20cf5d02ec.png)
-
  ## OBJECTIVES / 实验目标
 
 With the vigorous development of deep learning in many areas, many research or industry groups have purchased a large number of GPU servers; In addition, the group may also have many servers with different settings and usages.These servers are relatively independent. When the number of servers is increasing, it becomes difficult to obtain the real-time operation status of these servers and to make decisions on scheduling allocation, server selection, etc.
@@ -34,6 +31,11 @@ While completing the task, master the design and implementation capability of da
 (1)	Docker, Docker compose；
 (2)	Python 3.7；
 (3)	MySQL, Redis, Kafka, Hbase, Hadoop, etc；
+
+## Demo / 运行效果
+
+![image](https://user-images.githubusercontent.com/5326903/220550783-1a1a0066-cf48-46e7-b518-cef7428d3232.png)
+![image](https://user-images.githubusercontent.com/5326903/220550854-956f693e-b87c-427d-9145-da20cf5d02ec.png)
 
 
 
