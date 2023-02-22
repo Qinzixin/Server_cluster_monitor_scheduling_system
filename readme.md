@@ -4,17 +4,17 @@
 
 With the vigorous development of deep learning in many areas, many research or industry groups have purchased a large number of GPU servers; In addition, the group may also have many servers with different settings and usages.These servers are relatively independent. When the number of servers is increasing, it becomes difficult to obtain the real-time operation status of these servers and to make decisions on scheduling allocation, server selection, etc.
 
-As time goes by, this will inevitably lead to the ***LONG-TAIL*** problem of "everyone grabs a server" and the waste problem of "unpopular servers have resources but no one uses them", caused by limited server resources or information imbalance. How to collect data indicators that reflect the running status of the server, process its large-scale service status data in real time, and form information that supports user decision-making has become an important issue.
+As time goes by, this will inevitably lead to the ***LONG-TAIL*** problem of "everyone grabs a server but unpopular servers have resources but no one uses them", caused by limited server resources or information imbalance. How to collect data indicators that reflect the running status of the server, process its large-scale service status data in real time, and form information that supports user decision-making has become an important issue.
 
 Facing such problems, this project aims to solve the following tasks:
 
 (1) Collect the operation indicators of the specified server regularly, and provide a page to display the operation indicators of each monitored server in real time;
 
-(2) Design the data warehouse system architecture, data table structure, etc., and generate usage reports by day, month, year and other cycles to assist in making decisions related to scheduling and distribution;
+(2) Design the data warehouse system architecture, data table structure, etc., and generate usage reports by day, month, year and other cycles to assist in making decisions related to scheduling and resource allocation;
 
-(3) According to the real-time usage of each server and previous reports, real-time server usage recommendations are given.
+(3) According to the real-time usage of each server and previous reports, give real-time server recommendations.
 
-While completing the task, master the design and implementation capability of data model of data warehouse/big data platform, and the architecture design capability of data-driven real-time/near-real-time intelligent decision support system.
+While completing the coursework, student is expected to appreciate the capability of data model/ data warehouse/ big data platform and data-driven real-time or near-real-time intelligent decision support system (DSS).
 
 随着深度学习的蓬勃发展以及在其许多问题上优良的表现，越来越多的研究者和团队投入到了其研究中，或是将其应用于生产中。为支持深度模型的训练与运行，许多研究单位都采购了大量的GPU服务器；此外，单位可能还拥有许多搭载服务、用途多样的服务器。
 
@@ -34,8 +34,8 @@ While completing the task, master the design and implementation capability of da
 
 ## Demo / 运行效果
 
-![image](https://user-images.githubusercontent.com/5326903/220550783-1a1a0066-cf48-46e7-b518-cef7428d3232.png)
-![image](https://user-images.githubusercontent.com/5326903/220550854-956f693e-b87c-427d-9145-da20cf5d02ec.png)
+![image  width="100px"](https://user-images.githubusercontent.com/5326903/220550783-1a1a0066-cf48-46e7-b518-cef7428d3232.png)
+![image  width="100px"](https://user-images.githubusercontent.com/5326903/220550854-956f693e-b87c-427d-9145-da20cf5d02ec.png)
 
 
 
